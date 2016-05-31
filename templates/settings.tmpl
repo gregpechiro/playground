@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ template "head.tmpl" . }}
+        <title>Settings</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand">Settings</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a style="cursor:pointer;" id="reset">Reset</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/">Back</a></li>
+                        <!-- <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li> -->
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <select class="form-control" id="theme">
+                            <option value="ace/theme/ambiance">ambiance</option>
+                            <option value="ace/theme/chaos">chaos</option>
+                            <option value="ace/theme/chrome">chrome</option>
+                            <option value="ace/theme/clouds">clouds</option>
+                            <option value="ace/theme/clouds_midnight">clouds_midnight</option>
+                            <option value="ace/theme/cobalt">cobalt</option>
+                            <option value="ace/theme/crimson_editor">crimson_editor</option>
+                            <option value="ace/theme/dawn">dawn</option>
+                            <option value="ace/theme/dreamweaver">dreamweaver</option>
+                            <option value="ace/theme/eclipse">eclipse</option>
+                            <option value="ace/theme/github">github</option>
+                            <option value="ace/theme/idle_fingers">idle_fingers</option>
+                            <option value="ace/theme/iplastic">iplastic</option>
+                            <option value="ace/theme/katzenmilch">katzenmilch</option>
+                            <option value="ace/theme/kr_theme">kr_theme</option>
+                            <option value="ace/theme/kuroir">kuroir</option>
+                            <option value="ace/theme/merbivore">merbivore</option>
+                            <option value="ace/theme/merbivore_soft">merbivore_soft</option>
+                            <option value="ace/theme/mono_industrial">mono_industrial</option>
+                            <option value="ace/theme/monokai">monokai</option>
+                            <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
+                            <option value="ace/theme/solarized_dark">solarized_dark</option>
+                            <option value="ace/theme/solarized_light">solarized_light</option>
+                            <option value="ace/theme/sqlserver">sqlserver</option>
+                            <option value="ace/theme/terminal">terminal</option>
+                            <option value="ace/theme/textmate">textmate</option>
+                            <option value="ace/theme/tomorrow">tomorrow</option>
+                            <option value="ace/theme/tomorrow_night">tomorrow_night</option>
+                            <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
+                            <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
+                            <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
+                            <option value="ace/theme/twilight">twilight</option>
+                            <option value="ace/theme/vibrant_ink">vibrant_ink</option>
+                            <option value="ace/theme/xcode">xcode</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="number" id="fontSize">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div id="editor" style="height:200px;">package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello World")
+}</div>
+                </div>
+            </div>
+        </div>
+
+
+        {{ template "scripts.tmpl" }}
+
+        <script type="text/javascript">
+
+            $('#theme').change(function() {
+                var theme = $('#theme').val()
+                editor.setTheme(theme);
+                settings['editor']['theme'] = theme;
+                saveSettings(settings);
+            });
+
+            $('#fontSize').change(function() {
+                var fontSize =+ $('#fontSize').val();
+                editor.setFontSize(fontSize);
+                settings['editor']['fontSize'] = fontSize;
+                saveSettings(settings);
+            })
+
+            $(document).ready(function() {
+                $('#theme').val(editor.getTheme());
+                $('#fontSize').val(editor.getFontSize());
+            });
+
+            $('#reset').click(function() {
+                settings['editor'] = {};
+                saveSettings(settings);
+                location.reload();
+            });
+        </script>
+    </body>
+</html>

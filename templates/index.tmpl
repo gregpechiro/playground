@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{ template "head.tmpl" . }}
+        <title>TEST</title>
+        <link rel="stylesheet" href="/static/css/index.css" charset="utf-8">
+    </head>
+    <body>
+
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" >Playground</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#" id="run">Run</a></li>
+                        <li><a href="#" id="format">Format</a></li>
+                        <li>
+                            <div class="checkbox navcheck">
+                                <input type="checkbox" id="import" checked><span>Import</span>
+                            </div>
+                        </li>
+                        <li><a href="#" id="export">Export</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-10">
+                    <div id="editor" style="height:450px;">package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, custom playground")
+}</div>
+                    <div id="output" class="output">
+                        <div id="controls">
+                            <a id="expand" class="btn control">Expand</a>
+                            <a id="collapse" class="btn hide control">Collapse</a>
+                        </div>
+                        <pre id="outpre"></pre>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label>Theme</label>
+                        <select class="form-control" id="theme">
+                            <option value="ace/theme/ambiance">ambiance</option>
+                            <option value="ace/theme/chaos">chaos</option>
+                            <option value="ace/theme/chrome">chrome</option>
+                            <option value="ace/theme/clouds">clouds</option>
+                            <option value="ace/theme/clouds_midnight">clouds_midnight</option>
+                            <option value="ace/theme/cobalt">cobalt</option>
+                            <option value="ace/theme/crimson_editor">crimson_editor</option>
+                            <option value="ace/theme/dawn">dawn</option>
+                            <option value="ace/theme/dreamweaver">dreamweaver</option>
+                            <option value="ace/theme/eclipse">eclipse</option>
+                            <option value="ace/theme/github">github</option>
+                            <option value="ace/theme/idle_fingers">idle_fingers</option>
+                            <option value="ace/theme/iplastic">iplastic</option>
+                            <option value="ace/theme/katzenmilch">katzenmilch</option>
+                            <option value="ace/theme/kr_theme">kr_theme</option>
+                            <option value="ace/theme/kuroir">kuroir</option>
+                            <option value="ace/theme/merbivore">merbivore</option>
+                            <option value="ace/theme/merbivore_soft">merbivore_soft</option>
+                            <option value="ace/theme/mono_industrial">mono_industrial</option>
+                            <option value="ace/theme/monokai">monokai</option>
+                            <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
+                            <option value="ace/theme/solarized_dark">solarized_dark</option>
+                            <option value="ace/theme/solarized_light">solarized_light</option>
+                            <option value="ace/theme/sqlserver">sqlserver</option>
+                            <option value="ace/theme/terminal">terminal</option>
+                            <option value="ace/theme/textmate">textmate</option>
+                            <option value="ace/theme/tomorrow">tomorrow</option>
+                            <option value="ace/theme/tomorrow_night">tomorrow_night</option>
+                            <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
+                            <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
+                            <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
+                            <option value="ace/theme/twilight">twilight</option>
+                            <option value="ace/theme/vibrant_ink">vibrant_ink</option>
+                            <option value="ace/theme/xcode">xcode</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Font Size</label>
+                        <input class="form-control" type="number" id="fontSize">
+                    </div>
+                    <div class="form-group">
+                        <label>Keybindings</label>
+                        <select class="form-control">
+                            <option value="">Ace</option>
+                            <option value="">Vim</option>
+                            <option value="">Emacs</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <a class="hide" id="hiddenExport">GET</a>
+
+        {{ template "scripts.tmpl" . }}
+
+        <script>
+
+            heightQuart = Math.floor((window.innerHeight - 80) / 4);
+
+            $('#export').click(function() {
+                var blob = new Blob([editor.getValue()], {type : 'text/plain'});
+                $('a#hiddenExport').attr('href', window.URL.createObjectURL(blob));
+                $('a#hiddenExport').attr('download', 'main.go');
+                $('a#hiddenExport')[0].click();
+            });
+
+            $('#run').click(function() {
+                $('#output').removeClass('text-danger');
+                $('#outpre').text('Processing');
+                var doc = editor.getValue();
+                settings.code = doc;
+                saveSettings(settings);
+                if (doc !== '') {
+                    $.ajax({
+                        url: '/run',
+                        method: 'POST',
+                        data: {
+                            dat: doc
+                        },
+                        success: function(resp) {
+                            console.log('ajax success');
+                            test = resp
+                            if (!resp.error) {
+                                $('#outpre').removeClass('text-danger');
+                            } else {
+                                $('#outpre').addClass('text-danger');
+                                markLines(resp.output);
+                            }
+                            $('#outpre').text(resp.output);
+                        },
+                        error: function() {
+                            console.log('ajax error');
+                            $('#outpre').addClass('text-danger');
+                            $('#outpre').text('Server error. Please try again.');
+                        }
+                    })
+                }
+            });
+
+            $('#format').click(function() {
+                $('#outpre').removeClass('text-danger');
+                $('#outpre').text('Processing');
+                var doc = editor.getValue();
+                settings.code = doc;
+                saveSettings(settings);
+                if (doc !== '') {
+                    $.ajax({
+                        url: '/format',
+                        method: 'POST',
+                        data: {
+                            dat: doc,
+                            imp: (document.getElementById("import").checked ? 'true' : 'false')
+                        },
+                        success: function(resp) {
+                            test = resp
+                            if (!resp.error) {
+                                editor.setValue(resp.output, 1);
+                                settings.code = resp.output;
+                                saveSettings(settings);
+                                return
+                            }
+                            $('#outpre').addClass('text-danger');
+                            $('#outpre').text(resp.output);
+                        },
+                        error: function() {
+                            console.log('ajax error');
+                            $('#outpre').addClass('text-danger');
+                            $('#outpre').text('Server error. Please try again.');
+                        }
+                    })
+                }
+                $('#outpre').text('');
+            });
+
+            function markLines(output) {
+                var outputList = output.split('\n');
+                var annotations = [];
+                for (var i = 0; i < outputList.length; i++) {
+                    if (outputList[i] !== '') {
+                        var lineList = outputList[i].split(':');
+                        var lineNum =+ lineList[0].replace('Line ', '');
+                        var msg = lineList.slice(1, lineList.length).join(':');
+                        annotations.push(
+                            {
+                                row: (lineNum - 1),
+                                column: 0,
+                                text: msg,
+                                type: "error"
+                            }
+                        );
+                    }
+                }
+                editor.getSession().setAnnotations(annotations);
+            }
+
+
+            $(document).ready(function() {
+
+                document.getElementById('import').checked = settings.import;
+                $('#theme').val(editor.getTheme());
+                $('#fontSize').val(editor.getFontSize());
+                window.setTimeout(function() {
+                    if (settings.code !== '' && settings.code !== undefined) {
+                       var load = confirm("Your have previous save code. Would you like to load it?");
+                       if (load == true) {
+                           editor.setValue(settings.code, 1);
+                       } else {
+                           settings.code = '';
+                           saveSettings(settings);
+                       }
+                    }
+                }, 500);
+
+                $('#editor').css('height', (heightQuart * 3) + 'px');
+                $('#outpre').css('height', heightQuart + 'px');
+
+                $('#expand').click(function() {
+                    $('#editor').animate({height:(heightQuart) + 'px'});
+                    $('#outpre').animate({height:(heightQuart * 3) + 'px'});
+                    $('#expand').addClass('hide');
+                    $('#collapse').removeClass('hide');
+                });
+
+                $('#collapse').click(function() {
+                    $('#editor').animate({height:(heightQuart * 3) + 'px'});
+                    $('#outpre').animate({height:(heightQuart) + 'px'});
+                    $('#collapse').addClass('hide');
+                    $('#expand').removeClass('hide');
+                });
+
+            });
+
+            $('#import').click(function() {
+                if (this.checked) {
+                    settings.import = true;
+                } else {
+                    settings.import = false;
+                }
+                saveSettings(settings);
+            });
+
+            $('#theme').change(function() {
+                var theme = $('#theme').val()
+                editor.setTheme(theme);
+                settings['editor']['theme'] = theme;
+                saveSettings(settings);
+            });
+
+            $('#fontSize').change(function() {
+                var fontSize =+ $('#fontSize').val();
+                editor.setFontSize(fontSize);
+                settings['editor']['fontSize'] = fontSize;
+                saveSettings(settings);
+            });
+
+            $('#reset').click(function() {
+                settings['editor'] = {};
+                saveSettings(settings);
+                location.reload();
+            });
+
+        </script>
+    </body>
+</html>

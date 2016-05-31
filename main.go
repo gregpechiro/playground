@@ -25,7 +25,7 @@ func init() {
 
 func main() {
 
-	mux.AddRoutes(index, run, format, settings)
+	mux.AddRoutes(index, run, format)
 
 	fmt.Println("REMEMBER TO REGISTER ANY NEW ROUTES")
 	log.Fatal(http.ListenAndServe(":8080", mux))
@@ -33,10 +33,6 @@ func main() {
 
 var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
 	tmpl.Render(w, r, "index.tmpl", web.Model{})
-}}
-
-var settings = web.Route{"GET", "/settings", func(w http.ResponseWriter, r *http.Request) {
-	tmpl.Render(w, r, "settings.tmpl", web.Model{})
 }}
 
 var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request) {
@@ -49,124 +45,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	dat := []byte(r.FormValue("dat"))
-	ioutil.WriteFile(path+"/main.go", dat, 0644)
-
-	//var cmd *exec.Cmd
-	//cmd = exec.Command("go", "run", path+"/main.go")
-
-	/*stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Printf("stdout error.\n")
-		resp["error"] = true
-		resp["msg"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
-		return
-	}
-
-	// stderr, err := cmd.StderrPipe()
-	// if err != nil {
-	// 	log.Printf("stderr error.\n")
-	// 	resp["error"] = true
-	// 	resp["msg"] = "Server error. Please try again."
-	// 	ajaxResponse(w, resp)
-	// 	return
-	// }
-
-	if err := cmd.Start(); err != nil {
-		log.Printf("Start error.\n")
-		resp["error"] = true
-		resp["msg"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
-		return
-	}
-	var timer *time.Timer
-
-
-	// timer = time.AfterFunc(10*time.Second, func() {
-	// 	//cmd.Process.Signal(os.Signal)
-	// 	if err := cmd.Process.Kill(); err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	//
-	// 	fmt.Println(cmd.Process.Pid)
-	//
-	// 	if err := cmd.Process.Kill(); err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// })
-
-	timer = time.NewTimer(time.Second * 4)
-	go func(timer *time.Timer, cmd *exec.Cmd) {
-		for _ = range timer.C {
-			fmt.Println(cmd.ProcessState)
-			err := cmd.Process.Signal(os.Kill)
-			fmt.Println(err)
-			//printError(err)
-			//ticker.Stop()
-		}
-	}(timer, cmd)
-
-	var b bytes.Buffer
-	b.ReadFrom(stdout)
-
-	if err := cmd.Wait(); err != nil {
-		log.Printf("Wait error %v.\n", err)
-		resp["error"] = true
-		resp["msg"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
-		return
-	}
-
-	if !timer.Stop() {
-		log.Printf("Proccess took too long.\n")
-		resp["error"] = true
-		resp["msg"] = "Proccess took too long."
-		ajaxResponse(w, resp)
-		return
-	}*/
-
-	/*b, err := ioutil.ReadAll(stdout.Read(p))
-	if err != nil {
-		log.Printf("ioutil ReadAll %v.\n", err)
-		resp["error"] = true
-		resp["msg"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
-		return
-	}*/
-
-	/*b.ReadFrom(stdout)
-	fmt.Printf("OUTPUT %s\n", b.Bytes())
-
-	var e bytes.Buffer
-	e.ReadFrom(stderr)
-	fmt.Printf("ERR %s\n", e.Bytes())*/
-
-	// time after func
-	//cmd := exec.Command("go", "run", path+"/main.go")
-
-	/*go time.AfterFunc(10*time.Second, func() {
-		if err := cmd.Process.Kill(); err == nil {
-			log.Printf("Killing process %d\n", cmd.Process.Pid)
-			resp["error"] = true
-			resp["msg"] = "Proccess took too long."
-			ajaxResponse(w, resp)
-			return
-		}
-		return
-	})
-
-	b, err := cmd.CombinedOutput()
-
-	if err != nil {
-		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n", err)
-		resp["error"] = true
-		out := fmt.Sprintf("%s", b)
-		out = strings.Replace(out, "# command-line-arguments\n", "", -1)
-		out = strings.Replace(out, "temp/main.go:", "Line ", -1)
-		resp["output"] = out
-		ajaxResponse(w, resp)
-		return
-	}*/
+	ioutil.WriteFile(path+"/main.go", dat, 0644)*/
 
 	out, err := runCmd(10, "go", "run", path+"/main.go")
 

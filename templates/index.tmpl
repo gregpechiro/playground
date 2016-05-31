@@ -114,9 +114,6 @@ func main() {
         {{ template "scripts.tmpl" . }}
 
         <script>
-
-            heightQuart = Math.floor((window.innerHeight - 80) / 4);
-
             $('#export').click(function() {
                 var blob = new Blob([editor.getValue()], {type : 'text/plain'});
                 $('a#hiddenExport').attr('href', window.URL.createObjectURL(blob));
@@ -215,6 +212,8 @@ func main() {
 
 
             $(document).ready(function() {
+
+                var heightQuart = Math.floor((window.innerHeight - 80) / 4);
 
                 document.getElementById('import').checked = settings.import;
                 $('#theme').val(editor.getTheme());

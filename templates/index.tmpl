@@ -21,15 +21,15 @@
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li><a href="#" id="run">Run</a></li>
-                        <li><a href="#" id="format">Format</a></li>
+                        <li><a class="click" id="run">Run</a></li>
+                        <li><a class="click" id="format">Format</a></li>
                         <li>
                             <div class="checkbox navcheck">
                                 <input type="checkbox" id="import" checked><span>Import</span>
                             </div>
                         </li>
-                        <li><a href="#" id="export">Export</a></li>
-                        <li><a href="#" id="share">Share</a></li>
+                        <li><a class="click" id="export">Export</a></li>
+                        <li><a class="click" id="share">Share</a></li>
                     </ul>
                 </div>
             </div>
@@ -38,13 +38,13 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-10">
-                    <div id="editor" style="height:450px;">package main
+                    <div id="editor" style="height:450px;">{{ if .code }}{{ .code }}{{  else }}package main
 
 import "fmt"
 
 func main() {
     fmt.Println("Hello, custom playground")
-}</div>
+}{{ end }}</div>
                     <div id="output" class="output">
                         <div id="controls">
                             <a id="expand" class="btn control">Expand</a>
@@ -99,10 +99,10 @@ func main() {
                     </div>
                     <div class="form-group">
                         <label>Keybindings</label>
-                        <select class="form-control">
-                            <option value="">Ace</option>
-                            <option value="">Vim</option>
-                            <option value="">Emacs</option>
+                        <select id="keybindings" class="form-control">
+                            <option value="ace">Ace</option>
+                            <option value="vim">Vim</option>
+                            <option value="emacs">Emacs</option>
                         </select>
                     </div>
                 </div>
@@ -118,7 +118,6 @@ func main() {
 
             $('#run').click(function() {
                 editor.getSession().clearAnnotations();
-                $('#output').removeClass('text-danger');
                 $('#outpre').css('color', '');
                 $('#outpre').text('Processing');
                 var doc = editor.getValue();
@@ -133,21 +132,16 @@ func main() {
                         },
                         success: function(resp) {
                             console.log('ajax success');
-                            test = resp
                             if (!resp.error) {
-                                $('#outpre').removeClass('text-danger');
                                 $('#outpre').css('color', '');
                             } else {
-                                $('#outpre').addClass('text-danger');
                                 $('#outpre').css('color', 'orangered');
-                                console.log(resp);
                                 markLines(resp.output);
                             }
                             $('#outpre').text(resp.output);
                         },
                         error: function() {
                             console.log('ajax error');
-                            $('#outpre').addClass('text-danger');
                             $('#outpre').css('color', 'orangered');
                             $('#outpre').text('Server error. Please try again.');
                         }
@@ -157,8 +151,8 @@ func main() {
 
             $('#format').click(function() {
                 editor.getSession().clearAnnotations();
-                $('#outpre').removeClass('text-danger');
                 $('#outpre').text('Processing');
+                $('#outpre').css('color', '');
                 var doc = editor.getValue();
                 settings.code = doc;
                 saveSettings(settings);
@@ -171,14 +165,14 @@ func main() {
                             imp: (document.getElementById("import").checked ? 'true' : 'false')
                         },
                         success: function(resp) {
-                            test = resp
                             if (!resp.error) {
+                                inputChanged();
                                 editor.setValue(resp.output, 1);
                                 settings.code = resp.output;
                                 saveSettings(settings);
+                                $('#outpre').text('Formated');
                                 return
                             }
-                            $('#outpre').addClass('text-danger');
                             $('#outpre').css('color', 'orangered');
                             $('#outpre').text(resp.output);
                         },
@@ -189,7 +183,7 @@ func main() {
                         }
                     })
                 }
-                $('#outpre').text('Formated');
+                $('#outpre').text('');
             });
 
             $('#export').click(function() {
@@ -200,33 +194,33 @@ func main() {
             });
 
             $('#share').click(function() {
+                $('#outpre').css('color', '');
+                $('#outpre').text('');
                 var doc = editor.getValue();
                 settings.code = doc;
                 saveSettings(settings);
                 if (doc !== '') {
                     $.ajax({
-                        url: '/run',
+                        url: '/share',
                         method: 'POST',
                         data: {
                             dat: doc
                         },
                         success: function(resp) {
                             console.log('ajax success');
-                            test = resp
-                            if (!resp.error) {
-                                $('#outpre').removeClass('text-danger');
-                                $('#outpre').css('color', '');
-                            } else {
-                                $('#outpre').addClass('text-danger');
+                            if (resp.error) {
                                 $('#outpre').css('color', 'orangered');
-                                console.log(resp);
-                                markLines(resp.output);
+                                $('#outpre').text(resp.output);
+                                return
                             }
-                            $('#outpre').text(resp.output);
+                            var hd = {"code": editor.getValue()}
+                            path = "/" + resp.output;
+                            //var url = origin(window.location) + path;
+                            //shareURL.show().val(url).focus().select();
+                            window.history.pushState(hd, "", path);
                         },
                         error: function() {
                             console.log('ajax error');
-                            $('#outpre').addClass('text-danger');
                             $('#outpre').css('color', 'orangered');
                             $('#outpre').text('Server error. Please try again.');
                         }
@@ -263,18 +257,19 @@ func main() {
                 document.getElementById('import').checked = settings.import;
                 $('#theme').val(editor.getTheme());
                 $('#fontSize').val(editor.getFontSize());
-                window.setTimeout(function() {
-                    if (settings.code !== '' && settings.code !== undefined) {
-                       var load = confirm("Your have previous save code. Would you like to load it?");
-                       if (load == true) {
-                           editor.setValue(settings.code, 1);
-                       } else {
-                           settings.code = '';
-                           saveSettings(settings);
-                       }
-                    }
-                }, 500);
-
+                {{ if not .loaded }}
+                    window.setTimeout(function() {
+                        if (settings.code !== '' && settings.code !== undefined) {
+                            var load = confirm("Your have previous save code. Would you like to load it?");
+                            if (load == true) {
+                                editor.setValue(settings.code, 1);
+                            } else {
+                                settings.code = '';
+                                saveSettings(settings);
+                            }
+                        }
+                    }, 500);
+                {{ end }}
                 $('#editor').css('height', (heightQuart * 3) + 'px');
                 $('#outpre').css('height', heightQuart + 'px');
 
@@ -317,10 +312,34 @@ func main() {
                 saveSettings(settings);
             });
 
+            $('#keybindings').change(function() {
+                var bind = $('#keybindings').val();
+                if (bind === 'ace') {
+
+                } else if (bind === 'vim') {
+                    editor.setKeyboardHandler("ace/keyboard/vim")
+                } else {
+                    editor.setKeyboardHandler("ace/keyboard/emacs")
+                }
+                settings['editor']['keys'] = bind;
+                saveSettings(settings);
+            });
+
             $('#reset').click(function() {
                 settings['editor'] = {};
                 saveSettings(settings);
                 location.reload();
+            });
+
+            function inputChanged() {
+                if ((window.location.pathname == "/")) {
+                    return;
+                }
+                window.history.pushState(null, "", "/");
+            }
+
+            editor.on('change', function() {
+                inputChanged();
             });
 
         </script>

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,9 +16,13 @@ import (
 	"github.com/cagnosolutions/web"
 )
 
+const salt = "[replace this with something unique]"
+
 var mux = web.NewMux()
 
 var tmpl *web.TmplCache
+
+var projects = "projects"
 
 func init() {
 
@@ -25,7 +32,7 @@ func init() {
 
 func main() {
 
-	mux.AddRoutes(index, run, format)
+	mux.AddRoutes(index, run, format, share, view)
 
 	fmt.Println("REMEMBER TO REGISTER ANY NEW ROUTES")
 	log.Fatal(http.ListenAndServe(":8080", mux))
@@ -35,21 +42,38 @@ var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
 	tmpl.Render(w, r, "index.tmpl", web.Model{})
 }}
 
+var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadFile(projects + "/" + r.FormValue(":id") + "/" + "main.go")
+	if err != nil {
+		fmt.Fprintf(w, "snippet not found")
+		return
+	}
+
+	tmpl.Render(w, r, "index.tmpl", web.Model{
+		"code":   string(b),
+		"loaded": true,
+	})
+}}
+
 var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request) {
-	path := "temp"
+	dir := "temp"
+	path := projects + "/" + dir
 	resp := make(map[string]interface{})
+
 	if err := os.MkdirAll(path, 0755); err != nil {
 		log.Printf(`main.go >> run >> os.MkdirAll() >> %v\n`, err)
 		resp["error"] = true
-		resp["output"] = "Server error. Please try again. (MkdirAll)"
+		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)
 		return
 	}
+
 	dat := []byte(r.FormValue("dat"))
+
 	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
 		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
 		resp["error"] = true
-		resp["output"] = "Server error. Please try again. (WriteFile)"
+		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)
 		return
 	}
@@ -98,12 +122,10 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	out, err := runCmd(5, path+"/"+path)
+	out, err := runCmd(5, path+"/"+dir)
 	if err != nil {
 		log.Printf("main.go >> run >> runCmd() >> %v\n", err)
 		if err == ExecErr {
-			//out = strings.Replace(out, "# command-line-arguments\n", "", -1)
-			//out = strings.Replace(out, "temp/main.go:", "Line ", -1)
 			resp["output"] = out
 		} else if err == TimeOutErr {
 			resp["output"] = "Process took too long."
@@ -148,23 +170,37 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 }}
 
 var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Request) {
-	path := "temp"
+	dir := "temp"
+	path := projects + "/" + dir
 	resp := make(map[string]interface{})
+
 	if err := os.MkdirAll(path, 0755); err != nil {
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)
 		return
 	}
+
 	dat := []byte(r.FormValue("dat"))
-	ioutil.WriteFile(path+"/main.go", dat, 0644)
+
+	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
+		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
+		resp["error"] = true
+		resp["output"] = "Server error. Please try again. (WriteFile)"
+		ajaxResponse(w, resp)
+		return
+	}
+
 	var cmd *exec.Cmd
+
 	if r.FormValue("imp") == "true" {
 		cmd = exec.Command("goimports", path+"/main.go")
 	} else {
 		cmd = exec.Command("gofmt", path+"/main.go")
 	}
+
 	b, err := cmd.CombinedOutput()
+
 	if err != nil {
 		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n", err)
 		resp["error"] = true
@@ -172,10 +208,39 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 		ajaxResponse(w, resp)
 		return
 	}
+
 	resp["error"] = false
 	resp["output"] = fmt.Sprintf("%s", b)
 	ajaxResponse(w, resp)
 	return
+}}
+
+var share = web.Route{"POST", "/share", func(w http.ResponseWriter, r *http.Request) {
+	dat := []byte(r.FormValue("dat"))
+	dir := GetId(dat)
+	path := projects + "/" + dir
+	resp := make(map[string]interface{})
+
+	if err := os.MkdirAll(path, 0755); err != nil {
+		resp["error"] = true
+		resp["output"] = "Server error. Please try again."
+		ajaxResponse(w, resp)
+		return
+	}
+
+	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
+		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
+		resp["error"] = true
+		resp["output"] = "Server error. Please try again."
+		ajaxResponse(w, resp)
+		return
+	}
+
+	resp["error"] = false
+	resp["output"] = dir
+	ajaxResponse(w, resp)
+	return
+
 }}
 
 func ajaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
@@ -187,4 +252,14 @@ func ajaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
 		msg = `{"error":true,"msg":"Server error. Please try again."}`
 	}
 	fmt.Fprintf(w, msg)
+}
+
+func GetId(doc []byte) string {
+	h := sha1.New()
+	io.WriteString(h, salt)
+	h.Write(doc)
+	sum := h.Sum(nil)
+	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
+	base64.URLEncoding.Encode(b, sum)
+	return string(b)[:10]
 }

@@ -5,11 +5,11 @@ function saveSettings(settings) {
 }
 
 function getSettings() {
-    var settings = localStorage.getItem('settings');
-    if (settings !== undefined) {
-        settings = atob(settings);
-        if (settings !== '' && settings !== undefined) {
-            return JSON.parse(settings);
+    var s = localStorage.getItem('settings');
+    if (s !== undefined && s !== null && s !== '') {
+        s = atob(s);
+        if (s !== '' && s !== undefined && s[0] === '{') {
+            return JSON.parse(s);
         }
         saveSettings({'editor':{}})
     }

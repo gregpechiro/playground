@@ -55,12 +55,12 @@ func runCmd(timeout int, command string, args ...string) (string, error) {
 	case err := <-done:
 		if err != nil {
 			close(done)
-			return er.String(), BuildErr
+			return er.String(), ExecErr
 		}
 		return out.String(), nil
 	}
 }
 
-var BuildErr = errors.New("Build Error")
+var ExecErr = errors.New("Execution Error")
 
 var TimeOutErr = errors.New("Time Out")

@@ -29,6 +29,7 @@
                             </div>
                         </li>
                         <li><a href="#" id="export">Export</a></li>
+                        <li><a href="#" id="share">Share</a></li>
                     </ul>
                 </div>
             </div>
@@ -114,15 +115,11 @@ func main() {
         {{ template "scripts.tmpl" . }}
 
         <script>
-            $('#export').click(function() {
-                var blob = new Blob([editor.getValue()], {type : 'text/plain'});
-                $('a#hiddenExport').attr('href', window.URL.createObjectURL(blob));
-                $('a#hiddenExport').attr('download', 'main.go');
-                $('a#hiddenExport')[0].click();
-            });
 
             $('#run').click(function() {
+                editor.getSession().clearAnnotations();
                 $('#output').removeClass('text-danger');
+                $('#outpre').css('color', '');
                 $('#outpre').text('Processing');
                 var doc = editor.getValue();
                 settings.code = doc;
@@ -139,8 +136,11 @@ func main() {
                             test = resp
                             if (!resp.error) {
                                 $('#outpre').removeClass('text-danger');
+                                $('#outpre').css('color', '');
                             } else {
                                 $('#outpre').addClass('text-danger');
+                                $('#outpre').css('color', 'orangered');
+                                console.log(resp);
                                 markLines(resp.output);
                             }
                             $('#outpre').text(resp.output);
@@ -148,6 +148,7 @@ func main() {
                         error: function() {
                             console.log('ajax error');
                             $('#outpre').addClass('text-danger');
+                            $('#outpre').css('color', 'orangered');
                             $('#outpre').text('Server error. Please try again.');
                         }
                     })
@@ -155,6 +156,7 @@ func main() {
             });
 
             $('#format').click(function() {
+                editor.getSession().clearAnnotations();
                 $('#outpre').removeClass('text-danger');
                 $('#outpre').text('Processing');
                 var doc = editor.getValue();
@@ -177,16 +179,59 @@ func main() {
                                 return
                             }
                             $('#outpre').addClass('text-danger');
+                            $('#outpre').css('color', 'orangered');
+                            $('#outpre').text(resp.output);
+                        },
+                        error: function() {
+                            console.log('ajax error');
+                            $('#outpre').css('color', 'orangered');
+                            $('#outpre').text('Server error. Please try again.');
+                        }
+                    })
+                }
+                $('#outpre').text('Formated');
+            });
+
+            $('#export').click(function() {
+                var blob = new Blob([editor.getValue()], {type : 'text/plain'});
+                $('a#hiddenExport').attr('href', window.URL.createObjectURL(blob));
+                $('a#hiddenExport').attr('download', 'main.go');
+                $('a#hiddenExport')[0].click();
+            });
+
+            $('#share').click(function() {
+                var doc = editor.getValue();
+                settings.code = doc;
+                saveSettings(settings);
+                if (doc !== '') {
+                    $.ajax({
+                        url: '/run',
+                        method: 'POST',
+                        data: {
+                            dat: doc
+                        },
+                        success: function(resp) {
+                            console.log('ajax success');
+                            test = resp
+                            if (!resp.error) {
+                                $('#outpre').removeClass('text-danger');
+                                $('#outpre').css('color', '');
+                            } else {
+                                $('#outpre').addClass('text-danger');
+                                $('#outpre').css('color', 'orangered');
+                                console.log(resp);
+                                markLines(resp.output);
+                            }
                             $('#outpre').text(resp.output);
                         },
                         error: function() {
                             console.log('ajax error');
                             $('#outpre').addClass('text-danger');
+                            $('#outpre').css('color', 'orangered');
                             $('#outpre').text('Server error. Please try again.');
                         }
                     })
                 }
-                $('#outpre').text('');
             });
 
             function markLines(output) {

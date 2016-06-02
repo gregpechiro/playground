@@ -161,174 +161,12 @@ func main() {
 
         <script>
 
-            //var originalBindings = editor.getKeyboardHandler();
-
-            $('#run').click(function() {
-                editor.getSession().clearAnnotations();
-                $('#outpre').css('color', '');
-                $('#outpre').text('Processing');
-                var doc = editor.getValue();
-                settings.code = doc;
-                saveSettings(settings);
-                if (doc !== '') {
-                    $.ajax({
-                        url: '/run',
-                        method: 'POST',
-                        data: {
-                            dat: doc
-                        },
-                        success: function(resp) {
-                            console.log('ajax success');
-                            if (!resp.error) {
-                                $('#outpre').css('color', '');
-                            } else {
-                                $('#outpre').css('color', 'orangered');
-                                markLines(resp.output);
-                            }
-                            $('#outpre').text(resp.output);
-                        },
-                        error: function() {
-                            console.log('ajax error');
-                            $('#outpre').css('color', 'orangered');
-                            $('#outpre').text('Server error. Please try again.');
-                        }
-                    })
-                }
-            });
-
-            $('#format').click(function() {
-                editor.getSession().clearAnnotations();
-                $('#outpre').text('Processing');
-                $('#outpre').css('color', '');
-                var doc = editor.getValue();
-                settings.code = doc;
-                saveSettings(settings);
-                if (doc !== '') {
-                    $.ajax({
-                        url: '/format',
-                        method: 'POST',
-                        data: {
-                            dat: doc,
-                            imp: (document.getElementById("import").checked ? 'true' : 'false')
-                        },
-                        success: function(resp) {
-                            console.log('ajax success');
-                            console.log(resp);
-                            if (!resp.error) {
-                                inputChanged();
-                                editor.setValue(resp.output, 1);
-                                settings.code = resp.output;
-                                saveSettings(settings);
-                                $('#outpre').text('Formated');
-                                return
-                            }
-                            $('#outpre').css('color', 'orangered');
-                            $('#outpre').text(resp.output);
-                        },
-                        error: function() {
-                            console.log('ajax error');
-                            $('#outpre').css('color', 'orangered');
-                            $('#outpre').text('Server error. Please try again.');
-                        }
-                    })
-                }
-                $('#outpre').text('');
-            });
-
-            $('#export').click(function() {
-                var blob = new Blob([editor.getValue()], {type : 'text/plain'});
-                $('a#hiddenExport').attr('href', window.URL.createObjectURL(blob));
-                $('a#hiddenExport').attr('download', 'main.go');
-                $('a#hiddenExport')[0].click();
-            });
-
-            $('#share').click(function() {
-                $('#outpre').css('color', '');
-                $('#outpre').text('');
-                var doc = editor.getValue();
-                settings.code = doc;
-                saveSettings(settings);
-                if (doc !== '') {
-                    $.ajax({
-                        url: '/share',
-                        method: 'POST',
-                        data: {
-                            dat: doc
-                        },
-                        success: function(resp) {
-                            console.log('ajax success');
-                            if (resp.error) {
-                                $('#outpre').css('color', 'orangered');
-                                $('#outpre').text(resp.output);
-                                return
-                            }
-                            var hd = {"code": editor.getValue()}
-                            path = "/" + resp.output;
-                            //var url = origin(window.location) + path;
-                            //shareURL.show().val(url).focus().select();
-                            window.history.pushState(hd, "", path);
-                        },
-                        error: function() {
-                            console.log('ajax error');
-                            $('#outpre').css('color', 'orangered');
-                            $('#outpre').text('Server error. Please try again.');
-                        }
-                    })
-                }
-            });
-
-            function markLines(output) {
-                var outputList = output.split('\n');
-                var annotations = [];
-                for (var i = 0; i < outputList.length; i++) {
-                    if (outputList[i] !== '') {
-                        var lineList = outputList[i].split(':');
-                        var lineNum =+ lineList[0].replace('Line ', '');
-                        var msg = lineList.slice(1, lineList.length).join(':');
-                        annotations.push(
-                            {
-                                row: (lineNum - 1),
-                                column: 0,
-                                text: msg,
-                                type: "error"
-                            }
-                        );
-                    }
-                }
-                editor.getSession().setAnnotations(annotations);
-            }
-
 
             $(document).ready(function() {
 
                 var heightQuart = Math.floor((window.innerHeight - 80) / 4);
 
-                document.getElementById('import').checked = settings.import;
-                $('#theme').val(editor.getTheme());
-                $('#fontSize').val(editor.getFontSize());
-                if (settings.editor.keys === 'vim') {
-                    $('#keybindings').val('vim');
-                } else if (settings.editor.keys === 'emacs'){
-                    $('#keybindings').val('emacs');
-                }
-                if (settings.editor.load === 'load') {
-                    $('#load')[0].checked = true;
-                }
                 {{ if not .loaded }}
-                    //console.log(settings.code);
-                    //console.log(editor.getValue());
-                    /*window.setTimeout(function() {
-                        if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
-                            var load = confirm("Your have previous save code. Would you like to load it?");
-                            if (load == true) {
-                                editor.setValue(settings.code, 1);
-                            } else {
-                                settings.code = '';
-                                saveSettings(settings);
-                            }
-                        }
-                    }, 500);*/
-
                     if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
                         if (settings.editor.load !== 'load') {
                             $('#loadModal').modal({backdrop: 'static', keyboard: false});
@@ -347,8 +185,8 @@ func main() {
                             editor.setValue(settings.code, 1);
                         }
                     }
-
                 {{ end }}
+
                 $('#editor').css('height', (heightQuart * 3) + 'px');
                 $('#outpre').css('height', heightQuart + 'px');
 
@@ -366,65 +204,6 @@ func main() {
                     $('#expand').removeClass('hide');
                 });
 
-            });
-
-            $('#import').click(function() {
-                if (this.checked) {
-                    settings.import = true;
-                } else {
-                    settings.import = false;
-                }
-                saveSettings(settings);
-            });
-
-            $('#theme').change(function() {
-                var theme = $('#theme').val()
-                editor.setTheme(theme);
-                settings['editor']['theme'] = theme;
-                saveSettings(settings);
-            });
-
-            $('#fontSize').change(function() {
-                var fontSize =+ $('#fontSize').val();
-                editor.setFontSize(fontSize);
-                settings['editor']['fontSize'] = fontSize;
-                saveSettings(settings);
-            });
-
-            $('#keybindings').change(function() {
-                var bind = $('#keybindings').val();
-                if (bind === 'ace') {
-                    editor.setKeyboardHandler("");
-                } else if (bind === 'vim') {
-                    editor.setKeyboardHandler("ace/keyboard/vim");
-                } else {
-                    editor.setKeyboardHandler("ace/keyboard/emacs");
-                }
-                settings['editor']['keys'] = bind;
-                saveSettings(settings);
-            });
-
-            $('input[name="load"]').change(function() {
-                console.log('change');
-                settings['editor']['load'] = $('#load:checked').val();
-                saveSettings(settings);
-            });
-
-            $('#reset').click(function() {
-                settings['editor'] = {};
-                saveSettings(settings);
-                location.reload();
-            });
-
-            function inputChanged() {
-                if ((window.location.pathname == "/")) {
-                    return;
-                }
-                window.history.pushState(null, "", "/");
-            }
-
-            editor.on('change', function() {
-                inputChanged();
             });
 
         </script>

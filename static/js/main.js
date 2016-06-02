@@ -1,6 +1,14 @@
 
 var settings = {};
 var editor = ace.edit("editor");
+
+function inputChanged() {
+    if ((window.location.pathname == "/")) {
+        return;
+    }
+    window.history.pushState(null, "", "/");
+}
+
 $(document).ready(function() {
     editor.session.setMode("ace/mode/golang");
     editor.renderer.setShowGutter(true);
@@ -60,5 +68,9 @@ $(document).ready(function() {
             editor.selectMoreLines(1);
         },
         readOnly: false
+    });
+
+    editor.on('change', function() {
+        inputChanged();
     });
 });

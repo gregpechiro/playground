@@ -14,5 +14,25 @@ function getSettings() {
         saveSettings({'editor':{}})
     }
     return {'editor':{}};
+}
 
+function markLines(output) {
+    var outputList = output.split('\n');
+    var annotations = [];
+    for (var i = 0; i < outputList.length; i++) {
+        if (outputList[i] !== '') {
+            var lineList = outputList[i].split(':');
+            var lineNum =+ lineList[0].replace('Line ', '');
+            var msg = lineList.slice(1, lineList.length).join(':');
+            annotations.push(
+                {
+                    row: (lineNum - 1),
+                    column: 0,
+                    text: msg,
+                    type: "error"
+                }
+            );
+        }
+    }
+    editor.getSession().setAnnotations(annotations);
 }

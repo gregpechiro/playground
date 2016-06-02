@@ -7,13 +7,20 @@ $(document).ready(function() {
     editor.setHighlightActiveLine(true);
     editor.setReadOnly(false);
     editor.setDisplayIndentGuides(true);
+    editor.setOption("scrollPastEnd", 1);
+    editor.renderer.setScrollMargin(15)
     editor.$blockScrolling = Infinity
     $('textarea.ace_text-input').focus();
 
     settings = getSettings();
     if (settings.editor !== undefined && !$.isEmptyObject(settings.editor)) {
-        editor.setTheme((settings.editor.theme == '' ? 'ace/theme/monokai' : settings.editor.theme));
-        editor.setFontSize((settings.editor.fontSize == '' ? 12 : settings.editor.fontSize));
+        editor.setTheme(((settings.editor.theme === '' || settings.editor.theme === undefined) ? 'ace/theme/monokai' : settings.editor.theme));
+        editor.setFontSize(((settings.editor.fontSize === '' || settings.editor.fontSize === undefined) ? 12 : settings.editor.fontSize));
+        if (settings.editor.keys === 'vim') {
+            editor.setKeyboardHandler("ace/keyboard/vim");
+        } else if (settings.editor.keys === 'emacs'){
+            editor.setKeyboardHandler("ace/keyboard/emacs");
+        }
     } else {
         editor.setTheme('ace/theme/monokai');
         editor.setFontSize(12);

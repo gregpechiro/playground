@@ -26,6 +26,8 @@ var projects = "projects"
 
 func init() {
 
+	web.Funcs["pretty"] = pretty
+
 	tmpl = web.NewTmplCache()
 
 }
@@ -39,7 +41,9 @@ func main() {
 }
 
 var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
-	tmpl.Render(w, r, "index.tmpl", web.Model{})
+	tmpl.Render(w, r, "index.tmpl", web.Model{
+		"themes": themes,
+	})
 }}
 
 var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +56,7 @@ var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request)
 	tmpl.Render(w, r, "index.tmpl", web.Model{
 		"code":   string(b),
 		"loaded": true,
+		"themes": themes,
 	})
 }}
 

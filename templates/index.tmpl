@@ -43,8 +43,9 @@
 import "fmt"
 
 func main() {
-    fmt.Println("Hello, custom playground")
-}{{ end }}</div>
+&#09;fmt.Println("Hello, custom playground")
+}
+{{ end }}</div>
                     <div id="output" class="output">
                         <div id="controls">
                             <a id="expand" class="btn control">Expand</a>
@@ -57,7 +58,10 @@ func main() {
                     <div class="form-group">
                         <label>Theme</label>
                         <select class="form-control" id="theme">
-                            <option value="ace/theme/ambiance">ambiance</option>
+                            {{ range $theme := .themes }}
+                                <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
+                            {{ end }}
+                            <!-- <option value="ace/theme/ambiance">ambiance</option>
                             <option value="ace/theme/chaos">chaos</option>
                             <option value="ace/theme/chrome">chrome</option>
                             <option value="ace/theme/clouds">clouds</option>
@@ -90,7 +94,7 @@ func main() {
                             <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
                             <option value="ace/theme/twilight">twilight</option>
                             <option value="ace/theme/vibrant_ink">vibrant_ink</option>
-                            <option value="ace/theme/xcode">xcode</option>
+                            <option value="ace/theme/xcode">xcode</option> -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -115,6 +119,8 @@ func main() {
         {{ template "scripts.tmpl" . }}
 
         <script>
+
+            //var originalBindings = editor.getKeyboardHandler();
 
             $('#run').click(function() {
                 editor.getSession().clearAnnotations();
@@ -257,9 +263,17 @@ func main() {
                 document.getElementById('import').checked = settings.import;
                 $('#theme').val(editor.getTheme());
                 $('#fontSize').val(editor.getFontSize());
+                if (settings.editor.keys === 'vim') {
+                    $('#keybindings').val('vim');
+                } else if (settings.editor.keys === 'emacs'){
+                    $('#keybindings').val('emacs');
+                }
+
                 {{ if not .loaded }}
+                    //console.log(settings.code);
+                    //console.log(editor.getValue());
                     window.setTimeout(function() {
-                        if (settings.code !== '' && settings.code !== undefined) {
+                        if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
                             var load = confirm("Your have previous save code. Would you like to load it?");
                             if (load == true) {
                                 editor.setValue(settings.code, 1);
@@ -315,11 +329,11 @@ func main() {
             $('#keybindings').change(function() {
                 var bind = $('#keybindings').val();
                 if (bind === 'ace') {
-
+                    editor.setKeyboardHandler("");
                 } else if (bind === 'vim') {
-                    editor.setKeyboardHandler("ace/keyboard/vim")
+                    editor.setKeyboardHandler("ace/keyboard/vim");
                 } else {
-                    editor.setKeyboardHandler("ace/keyboard/emacs")
+                    editor.setKeyboardHandler("ace/keyboard/emacs");
                 }
                 settings['editor']['keys'] = bind;
                 saveSettings(settings);

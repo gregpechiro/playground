@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -64,3 +65,52 @@ func runCmd(timeout int, command string, args ...string) (string, error) {
 var ExecErr = errors.New("Execution Error")
 
 var TimeOutErr = errors.New("Time Out")
+
+func pretty(s string) string {
+	s = strings.Replace(s, "_", " ", -1)
+	s = strings.ToUpper(string(s[0])) + s[1:]
+	for i := 0; i < len(s); i++ {
+		if s[i] == byte(' ') {
+			s = s[:i+1] + strings.ToUpper(string(s[i+1])) + s[i+2:]
+		}
+	}
+	return s
+}
+
+var themes = []string{
+	"ambiance",
+	"chaos",
+	"chrome",
+	"clouds",
+	"clouds_midnight",
+	"cobalt",
+	"crimson_editor",
+	"dawn",
+	"dreamweaver",
+	"eclipse",
+	"github",
+	"gruvbox",
+	"idle_fingers",
+	"iplastic",
+	"katzenmilch",
+	"kr_theme",
+	"kuroir",
+	"merbivore",
+	"merbivore_soft",
+	"mono_industrial",
+	"monokai",
+	"pastel_on_dark",
+	"solarized_dark",
+	"solarized_light",
+	"sqlserver",
+	"terminal",
+	"textmate",
+	"tomorrow",
+	"tomorrow_night",
+	"tomorrow_night_blue",
+	"tomorrow_night_bright",
+	"tomorrow_night_eighties",
+	"twilight",
+	"vibrant_ink",
+	"xcode",
+}

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 clear
+
 DIR=`echo ${PWD##*/}`
 INCLUDE=("${DIR}" "templates/" "static")
 
@@ -31,5 +32,5 @@ if [ ! -f "$DIR.tar" ]; then
 	exit 1
 fi
 
-#echo "SCP to playground.gregpechiro.com..."
-#scp $DIR.tar greg@gregpechiro.com:/home/greg
+echo "SCP to playground.gregpechiro.com..."
+scp $DIR.tar greg@gregpechiro.com:/home/greg

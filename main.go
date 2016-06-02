@@ -37,7 +37,7 @@ func main() {
 	mux.AddRoutes(index, run, format, share, view)
 
 	fmt.Println("REMEMBER TO REGISTER ANY NEW ROUTES")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8888", mux))
 }
 
 var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +66,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	resp := make(map[string]interface{})
 
 	if err := os.MkdirAll(path, 0755); err != nil {
-		log.Printf(`main.go >> run >> os.MkdirAll() >> %v\n`, err)
+		log.Printf("main.go >> run >> os.MkdirAll() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)
@@ -76,7 +76,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	dat := []byte(r.FormValue("dat"))
 
 	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
-		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
+		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)
@@ -85,7 +85,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 
 	/*currentDir, err := os.Getwd()
 	if err != nil {
-		log.Printf(`main.go >> run >> os.Getwd >> %v\n`, err)
+		log.Printf(`main.go >> run >> os.Getwd >> %v\n\n`, err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
 		ajaxResponse(w, resp)
@@ -93,7 +93,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := os.Chdir(path); err != nil {
-		log.Printf("main.go >> run >> os.Chdir() >> %v\n", err)
+		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
 		ajaxResponse(w, resp)
@@ -104,7 +104,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	cmd.Dir = path
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf(`main.go >> run >> exec.Command.CombinedOutput("go", "clean") >> %v\n`, err)
+		log.Printf("main.go >> run >> exec.Command.CombinedOutput(\"go\", \"clean\") >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
 		ajaxResponse(w, resp)
@@ -115,7 +115,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	cmd.Dir = path
 	b, err = cmd.CombinedOutput()
 	if err != nil {
-		log.Printf(`main.go >> run >> exec.Command.CombinedOutput("go", "build") >> %v\n`, err)
+		log.Printf("main.go >> run >> exec.Command.CombinedOutput(\"go\", \"build\") >> %v\n\n", err)
 		out := string(b)
 		if i := strings.Index(out, "#"); i == 0 && strings.Contains(out, "\n") {
 			out = out[strings.Index(out, "\n")+1:]
@@ -129,7 +129,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 
 	out, err := runCmd(5, path+"/"+dir)
 	if err != nil {
-		log.Printf("main.go >> run >> runCmd() >> %v\n", err)
+		log.Printf("main.go >> run >> runCmd() >> %v\n\n", err)
 		if err == ExecErr {
 			resp["output"] = out
 		} else if err == TimeOutErr {
@@ -145,7 +145,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	/*out, err := runCmd(10, "go", "run", path+"/main.go")
 	if err != nil {
 		if err == BuildErr {
-			log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n", err)
+			log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n\n", err)
 			//out := fmt.Sprintf("%s", b)
 			out = strings.Replace(out, "# command-line-arguments\n", "", -1)
 			out = strings.Replace(out, "temp/main.go:", "Line ", -1)
@@ -161,7 +161,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	}*/
 
 	/*if err := os.Chdir(currentDir); err != nil {
-		log.Printf("main.go >> run >> os.Chdir() >> %v\n", err)
+		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
 		ajaxResponse(w, resp)
@@ -189,7 +189,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	dat := []byte(r.FormValue("dat"))
 
 	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
-		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
+		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again. (WriteFile)"
 		ajaxResponse(w, resp)
@@ -207,7 +207,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	b, err := cmd.CombinedOutput()
 
 	if err != nil {
-		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n", err)
+		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n\n", err)
 		resp["error"] = true
 		resp["resp"] = fmt.Sprintf("Server Error. Please try again.\n%s", b)
 		ajaxResponse(w, resp)
@@ -234,7 +234,7 @@ var share = web.Route{"POST", "/share", func(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
-		log.Printf(`main.go >> run >> ioutil.WriteFile() >> %v\n`, err)
+		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
 		ajaxResponse(w, resp)

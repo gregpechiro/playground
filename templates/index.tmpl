@@ -4,7 +4,7 @@
         {{ template "head.tmpl" . }}
         <title>Playground</title>
         <link rel="stylesheet" href="/static/css/index.css" charset="utf-8">
-        <link rel="icon" type="image/png" href="/static/img/gopher-cloud.png">
+        <link rel="icon" type="image/png" href="/static/img/gopher2.png">
     </head>
     <body>
 
@@ -55,60 +55,85 @@ func main() {
                         <pre id="outpre"></pre>
                     </div>
                 </div>
-                <div class="col-sm-2">
-                    <div class="form-group">
-                        <label>Theme</label>
-                        <select class="form-control" id="theme">
-                            {{ range $theme := .themes }}
-                                <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
-                            {{ end }}
-                            <!-- <option value="ace/theme/ambiance">ambiance</option>
-                            <option value="ace/theme/chaos">chaos</option>
-                            <option value="ace/theme/chrome">chrome</option>
-                            <option value="ace/theme/clouds">clouds</option>
-                            <option value="ace/theme/clouds_midnight">clouds_midnight</option>
-                            <option value="ace/theme/cobalt">cobalt</option>
-                            <option value="ace/theme/crimson_editor">crimson_editor</option>
-                            <option value="ace/theme/dawn">dawn</option>
-                            <option value="ace/theme/dreamweaver">dreamweaver</option>
-                            <option value="ace/theme/eclipse">eclipse</option>
-                            <option value="ace/theme/github">github</option>
-                            <option value="ace/theme/idle_fingers">idle_fingers</option>
-                            <option value="ace/theme/iplastic">iplastic</option>
-                            <option value="ace/theme/katzenmilch">katzenmilch</option>
-                            <option value="ace/theme/kr_theme">kr_theme</option>
-                            <option value="ace/theme/kuroir">kuroir</option>
-                            <option value="ace/theme/merbivore">merbivore</option>
-                            <option value="ace/theme/merbivore_soft">merbivore_soft</option>
-                            <option value="ace/theme/mono_industrial">mono_industrial</option>
-                            <option value="ace/theme/monokai">monokai</option>
-                            <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
-                            <option value="ace/theme/solarized_dark">solarized_dark</option>
-                            <option value="ace/theme/solarized_light">solarized_light</option>
-                            <option value="ace/theme/sqlserver">sqlserver</option>
-                            <option value="ace/theme/terminal">terminal</option>
-                            <option value="ace/theme/textmate">textmate</option>
-                            <option value="ace/theme/tomorrow">tomorrow</option>
-                            <option value="ace/theme/tomorrow_night">tomorrow_night</option>
-                            <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
-                            <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
-                            <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
-                            <option value="ace/theme/twilight">twilight</option>
-                            <option value="ace/theme/vibrant_ink">vibrant_ink</option>
-                            <option value="ace/theme/xcode">xcode</option> -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Font Size</label>
-                        <input class="form-control" type="number" id="fontSize">
-                    </div>
-                    <div class="form-group">
-                        <label>Keybindings</label>
-                        <select id="keybindings" class="form-control">
-                            <option value="ace">Ace</option>
-                            <option value="vim">Vim</option>
-                            <option value="emacs">Emacs</option>
-                        </select>
+                <div class="col-sm-2" style="padding-left:0">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Settings
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label>Theme</label>
+                                <select class="form-control" id="theme">
+                                    {{ range $theme := .themes }}
+                                        <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
+                                    {{ end }}
+                                    <!-- <option value="ace/theme/ambiance">ambiance</option>
+                                    <option value="ace/theme/chaos">chaos</option>
+                                    <option value="ace/theme/chrome">chrome</option>
+                                    <option value="ace/theme/clouds">clouds</option>
+                                    <option value="ace/theme/clouds_midnight">clouds_midnight</option>
+                                    <option value="ace/theme/cobalt">cobalt</option>
+                                    <option value="ace/theme/crimson_editor">crimson_editor</option>
+                                    <option value="ace/theme/dawn">dawn</option>
+                                    <option value="ace/theme/dreamweaver">dreamweaver</option>
+                                    <option value="ace/theme/eclipse">eclipse</option>
+                                    <option value="ace/theme/github">github</option>
+                                    <option value="ace/theme/idle_fingers">idle_fingers</option>
+                                    <option value="ace/theme/iplastic">iplastic</option>
+                                    <option value="ace/theme/katzenmilch">katzenmilch</option>
+                                    <option value="ace/theme/kr_theme">kr_theme</option>
+                                    <option value="ace/theme/kuroir">kuroir</option>
+                                    <option value="ace/theme/merbivore">merbivore</option>
+                                    <option value="ace/theme/merbivore_soft">merbivore_soft</option>
+                                    <option value="ace/theme/mono_industrial">mono_industrial</option>
+                                    <option value="ace/theme/monokai">monokai</option>
+                                    <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
+                                    <option value="ace/theme/solarized_dark">solarized_dark</option>
+                                    <option value="ace/theme/solarized_light">solarized_light</option>
+                                    <option value="ace/theme/sqlserver">sqlserver</option>
+                                    <option value="ace/theme/terminal">terminal</option>
+                                    <option value="ace/theme/textmate">textmate</option>
+                                    <option value="ace/theme/tomorrow">tomorrow</option>
+                                    <option value="ace/theme/tomorrow_night">tomorrow_night</option>
+                                    <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
+                                    <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
+                                    <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
+                                    <option value="ace/theme/twilight">twilight</option>
+                                    <option value="ace/theme/vibrant_ink">vibrant_ink</option>
+                                    <option value="ace/theme/xcode">xcode</option> -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Font Size</label>
+                                <input class="form-control" type="number" id="fontSize">
+                            </div>
+                            <div class="form-group">
+                                <label>Keybindings</label>
+                                <select id="keybindings" class="form-control">
+                                    <option value="ace">Ace</option>
+                                    <option value="vim">Vim</option>
+                                    <option value="emacs">Emacs</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Saved Code</label>
+                                <div class="radio" style="margin-top:0;">
+                                    <label>
+                                        <input type="radio" name="load" id="ask" value="ask" checked>
+                                        Always Ask
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="load" id="load" value="load">
+                                        Always Load
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <button id="reset" class="btn btn-danger btn-sm btn-block">Reset</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -116,6 +141,21 @@ func main() {
         </div>
 
         <a class="hide" id="hiddenExport">GET</a>
+
+        <div class="modal fade" id="loadModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Load</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4>Your have previous saved code. Would you like to load it?</h4>
+                        <button id="loadYes" class="btn btn-sm btn-success">Yes</button>
+                        <button id="loadNo" class="btn btn-sm btn-danger">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         {{ template "scripts.tmpl" . }}
 
@@ -172,6 +212,8 @@ func main() {
                             imp: (document.getElementById("import").checked ? 'true' : 'false')
                         },
                         success: function(resp) {
+                            console.log('ajax success');
+                            console.log(resp);
                             if (!resp.error) {
                                 inputChanged();
                                 editor.setValue(resp.output, 1);
@@ -269,11 +311,13 @@ func main() {
                 } else if (settings.editor.keys === 'emacs'){
                     $('#keybindings').val('emacs');
                 }
-
+                if (settings.editor.load === 'load') {
+                    $('#load')[0].checked = true;
+                }
                 {{ if not .loaded }}
                     //console.log(settings.code);
                     //console.log(editor.getValue());
-                    window.setTimeout(function() {
+                    /*window.setTimeout(function() {
                         if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
                             var load = confirm("Your have previous save code. Would you like to load it?");
                             if (load == true) {
@@ -283,7 +327,27 @@ func main() {
                                 saveSettings(settings);
                             }
                         }
-                    }, 500);
+                    }, 500);*/
+
+                    if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
+                        if (settings.editor.load !== 'load') {
+                            $('#loadModal').modal({backdrop: 'static', keyboard: false});
+
+                            $('#loadYes').click(function() {
+                                editor.setValue(settings.code, 1);
+                                $('#loadModal').modal('hide');
+                            });
+
+                            $('#loadNo').click(function() {
+                                settings.code = '';
+                                saveSettings(settings);
+                                $('#loadModal').modal('hide');
+                            });
+                        } else {
+                            editor.setValue(settings.code, 1);
+                        }
+                    }
+
                 {{ end }}
                 $('#editor').css('height', (heightQuart * 3) + 'px');
                 $('#outpre').css('height', heightQuart + 'px');
@@ -337,6 +401,12 @@ func main() {
                     editor.setKeyboardHandler("ace/keyboard/emacs");
                 }
                 settings['editor']['keys'] = bind;
+                saveSettings(settings);
+            });
+
+            $('input[name="load"]').change(function() {
+                console.log('change');
+                settings['editor']['load'] = $('#load:checked').val();
                 saveSettings(settings);
             });
 

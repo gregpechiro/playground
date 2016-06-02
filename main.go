@@ -191,7 +191,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	if err := ioutil.WriteFile(path+"/main.go", dat, 0644); err != nil {
 		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
-		resp["output"] = "Server error. Please try again. (WriteFile)"
+		resp["output"] = "Server error. Please try again"
 		ajaxResponse(w, resp)
 		return
 	}
@@ -209,7 +209,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n\n", err)
 		resp["error"] = true
-		resp["resp"] = fmt.Sprintf("Server Error. Please try again.\n%s", b)
+		resp["output"] = fmt.Sprintf("Server Error. Please try again.")
 		ajaxResponse(w, resp)
 		return
 	}

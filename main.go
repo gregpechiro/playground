@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 
 	"github.com/cagnosolutions/web"
 )
@@ -19,10 +20,9 @@ import (
 const salt = "[replace this with something unique]"
 
 var mux = web.NewMux()
-
 var tmpl *web.TmplCache
-
 var projects = "projects"
+var Mutex = sync.RWMutex{}
 
 func init() {
 
@@ -47,7 +47,9 @@ var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
 }}
 
 var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request) {
+	Mutex.RLock()
 	b, err := ioutil.ReadFile(projects + "/" + r.FormValue(":id") + "/" + "main.go")
+	Mutex.RUnlock()
 	if err != nil {
 		fmt.Fprintf(w, "snippet not found")
 		return
@@ -65,6 +67,8 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 	path := projects + "/" + dir
 	resp := make(map[string]interface{})
 
+	Mutex.Lock()
+	defer Mutex.Unlock()
 	if err := os.MkdirAll(path, 0755); err != nil {
 		log.Printf("main.go >> run >> os.MkdirAll() >> %v\n\n", err)
 		resp["error"] = true
@@ -256,7 +260,7 @@ func ajaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
 	if err != nil {
 		msg = `{"error":true,"msg":"Server error. Please try again."}`
 	}
-	fmt.Fprintf(w, msg)
+	fmt.Fprint(w, msg)
 }
 
 func GetId(doc []byte) string {

@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
     document.getElementById('import').checked = settings.import;
+    document.getElementById('formatOnRun').checked = settings.formatOnRun;
     $('#theme').val(editor.getTheme());
     $('#fontSize').val(editor.getFontSize());
     if (settings.editor.keys === 'vim') {
@@ -39,14 +40,18 @@ $(document).ready(function() {
         saveSettings(settings);
     });
 
+    $('#formatOnRun').change(function() {
+        settings['formatOnRun'] = this.checked;
+        saveSettings(settings);
+    });
+
     $('input[name="load"]').change(function() {
-        console.log('change');
         settings['editor']['load'] = $('#load:checked').val();
         saveSettings(settings);
     });
 
     $('#reset').click(function() {
-        settings['editor'] = {};
+        settings = {'editor':{}};
         saveSettings(settings);
         location.reload();
     });

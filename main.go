@@ -200,20 +200,38 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	var cmd *exec.Cmd
-
+	var com string
+	//var cmd *exec.Cmd
 	if r.FormValue("imp") == "true" {
-		cmd = exec.Command("goimports", path+"/main.go")
+		com = "goimports"
+		//cmd = exec.Command("goimports", path+"/main.go")
 	} else {
-		cmd = exec.Command("gofmt", path+"/main.go")
+		com = "gofmt"
+		//cmd = exec.Command("gofmt", path+"/main.go")
 	}
 
+	cmd := exec.Command(com, "main.go")
+	cmd.Dir = path
 	b, err := cmd.CombinedOutput()
 
 	if err != nil {
-		log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n\n", err)
+		log.Printf("main.go >> format >> cmd.CombinedOutput(%q, %q) >> %v\n\n", com, "main.go", err)
+		//resp["output"] = fmt.Sprintf("Server Error. Please try again.")
+
+		out := string(b)
+		if i := strings.Index(out, "#"); i == 0 && strings.Contains(out, "\n") {
+			out = out[strings.Index(out, "\n")+1:]
+		}
+		outL := strings.Split(out, ":")
+		if len(outL) > 2 {
+			out = "Line " + outL[1] + ":" + outL[3]
+		} else {
+			out = strings.Replace(out, "main.go:", "Line ", -1)
+		}
+
+		resp["output"] = out
+
 		resp["error"] = true
-		resp["output"] = fmt.Sprintf("Server Error. Please try again.")
 		ajaxResponse(w, resp)
 		return
 	}

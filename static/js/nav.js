@@ -51,6 +51,7 @@ $(document).ready(function() {
                 }
                 $('#outpre').css('color', 'orangered');
                 $('#outpre').text(resp.output);
+                markLines(resp.output);
                 return
             },
             error: function() {

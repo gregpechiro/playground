@@ -89,7 +89,7 @@ var themes = []string{
 	"dreamweaver",
 	"eclipse",
 	"github",
-	"gruvbox",
+	//"gruvbox",
 	"idle_fingers",
 	"iplastic",
 	"katzenmilch",

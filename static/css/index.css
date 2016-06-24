@@ -26,7 +26,7 @@ div.output {
     position: relative;
 }
 
-.output a.control {
+a.control {
     position: absolute;
     right: 20px;
     top: 20px;
@@ -35,9 +35,10 @@ div.output {
     color: #ccc;
     letter-spacing: 1px;
     transition: all .5s;
+    z-index: 98;
 }
 
-.output a.control:hover {
+a.control:hover {
     border: 1px solid gray;
     color: #282828;
     background: #e4e4e4;
@@ -52,4 +53,17 @@ div.output pre {
 
 a.click {
     cursor: pointer;
+}
+
+.ace_search.right {
+    color:#555;
+}
+
+table.tips {
+    margin:0 auto;
+}
+
+table.tips td {
+    vertical-align: top;
+    padding-bottom: 10px;
 }

@@ -32,13 +32,29 @@
                         <li><a class="click" id="export">Export</a></li>
                         <li><a class="click" id="share">Share</a></li>
                     </ul>
+
+                    <!-- <ul class="nav navbar-nav navbar-right">
+                        <li><a href="">Tips <i class="fa fa-question"></i></a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li>
+                    </ul> -->
+
                 </div>
+
             </div>
         </nav>
 
         <div class="container-fluid">
             <div class="row">
-                <div class="col-lg-10">
+                <div class="col-lg-10 col-xs-12">
                     <div id="editor" style="height:450px;">{{ if .code }}{{ .code }}{{  else }}package main
 
 import "fmt"
@@ -55,7 +71,7 @@ func main() {
                         <pre id="outpre"></pre>
                     </div>
                 </div>
-                <div class="col-sm-2" style="padding-left:0">
+                <div class="col-sm-2 col-xs-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Settings
@@ -67,40 +83,6 @@ func main() {
                                     {{ range $theme := .themes }}
                                         <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
                                     {{ end }}
-                                    <!-- <option value="ace/theme/ambiance">ambiance</option>
-                                    <option value="ace/theme/chaos">chaos</option>
-                                    <option value="ace/theme/chrome">chrome</option>
-                                    <option value="ace/theme/clouds">clouds</option>
-                                    <option value="ace/theme/clouds_midnight">clouds_midnight</option>
-                                    <option value="ace/theme/cobalt">cobalt</option>
-                                    <option value="ace/theme/crimson_editor">crimson_editor</option>
-                                    <option value="ace/theme/dawn">dawn</option>
-                                    <option value="ace/theme/dreamweaver">dreamweaver</option>
-                                    <option value="ace/theme/eclipse">eclipse</option>
-                                    <option value="ace/theme/github">github</option>
-                                    <option value="ace/theme/idle_fingers">idle_fingers</option>
-                                    <option value="ace/theme/iplastic">iplastic</option>
-                                    <option value="ace/theme/katzenmilch">katzenmilch</option>
-                                    <option value="ace/theme/kr_theme">kr_theme</option>
-                                    <option value="ace/theme/kuroir">kuroir</option>
-                                    <option value="ace/theme/merbivore">merbivore</option>
-                                    <option value="ace/theme/merbivore_soft">merbivore_soft</option>
-                                    <option value="ace/theme/mono_industrial">mono_industrial</option>
-                                    <option value="ace/theme/monokai">monokai</option>
-                                    <option value="ace/theme/pastel_on_dark">pastel_on_dark</option>
-                                    <option value="ace/theme/solarized_dark">solarized_dark</option>
-                                    <option value="ace/theme/solarized_light">solarized_light</option>
-                                    <option value="ace/theme/sqlserver">sqlserver</option>
-                                    <option value="ace/theme/terminal">terminal</option>
-                                    <option value="ace/theme/textmate">textmate</option>
-                                    <option value="ace/theme/tomorrow">tomorrow</option>
-                                    <option value="ace/theme/tomorrow_night">tomorrow_night</option>
-                                    <option value="ace/theme/tomorrow_night_blue">tomorrow_night_blue</option>
-                                    <option value="ace/theme/tomorrow_night_bright">tomorrow_night_bright</option>
-                                    <option value="ace/theme/tomorrow_night_eighties">tomorrow_night_eighties</option>
-                                    <option value="ace/theme/twilight">twilight</option>
-                                    <option value="ace/theme/vibrant_ink">vibrant_ink</option>
-                                    <option value="ace/theme/xcode">xcode</option> -->
                                 </select>
                             </div>
                             <div class="form-group">
@@ -157,6 +139,30 @@ func main() {
                         <h4>Your have previous saved code. Would you like to load it?</h4>
                         <button id="loadYes" class="btn btn-sm btn-success">Yes</button>
                         <button id="loadNo" class="btn btn-sm btn-danger">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="tipsModal" tabindex="-1" role="dialog" aria-labelledby="tipsModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="tipsModalTitle">Tips</h4>
+                    </div>
+                    <div id="tipsModalBody" class="modal-body clearfix">
+                        <div class="col-lg-8 col-lg-offset-2">
+                            <table class="tips">
+                                <tbody>
+                                    <tr><td class="text-left">Enter+Shift</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Run the code. This will also format the code if format on run is selected.</td></tr>
+                                    <tr><td class="text-left">Enter+Ctrl</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Format the code.</td></tr>
+                                    <tr><td class="text-left">Ctrl+F</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find one or all occurances of the given string.</td></tr>
+                                    <tr><td class="text-left">Ctrl+R</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find and Replace one or all occurances of the given string.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
                 </div>
             </div>

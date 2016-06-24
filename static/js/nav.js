@@ -1,4 +1,22 @@
-$(document).ready(function() {
+
+
+    function runWrap() {
+        editor.getSession().clearAnnotations();
+        $('#outpre').css('color', '');
+        $('#outpre').text('Processing');
+        var doc = editor.getValue();
+        if (doc !== '') {
+            settings.code = doc;
+            saveSettings(settings);
+            if (settings.formatOnRun) {
+                format(doc, true);
+                return
+            }
+            run(doc);
+            return
+        }
+        $('#outpre').text('');
+    }
 
     function run(doc) {
         $.ajax({
@@ -23,6 +41,20 @@ $(document).ready(function() {
                 $('#outpre').text('Server error. Please try again.');
             }
         });
+    }
+
+    function formatWrap() {
+        editor.getSession().clearAnnotations();
+        $('#outpre').text('Processing');
+        $('#outpre').css('color', '');
+        var doc = editor.getValue();
+        if (doc !== '') {
+            settings.code = doc;
+            saveSettings(settings);
+            format(doc, false);
+            return
+        }
+        $('#outpre').text('');
     }
 
     function format(doc, doRun) {
@@ -63,6 +95,8 @@ $(document).ready(function() {
         });
     }
 
+$(document).ready(function() {
+
     $('#run').click(function() {
         // editor.getSession().clearAnnotations();
         // $('#outpre').css('color', '');
@@ -94,20 +128,7 @@ $(document).ready(function() {
         //         }
         //     })
         // }
-        editor.getSession().clearAnnotations();
-        $('#outpre').css('color', '');
-        $('#outpre').text('Processing');
-        var doc = editor.getValue();
-        if (doc !== '') {
-            settings.code = doc;
-            saveSettings(settings);
-            if (settings.formatOnRun) {
-                format(doc, true);
-                return
-            }
-            run(doc);
-        }
-        $('#outpre').text('');
+        runWrap();
     });
 
     $('#format').click(function() {
@@ -150,16 +171,8 @@ $(document).ready(function() {
         //     })
         // }
         // $('#outpre').text('');
-        editor.getSession().clearAnnotations();
-        $('#outpre').text('Processing');
-        $('#outpre').css('color', '');
-        var doc = editor.getValue();
-        if (doc !== '') {
-            settings.code = doc;
-            saveSettings(settings);
-            format(doc, false);
-        }
-        $('#outpre').text('');
+        formatWrap();
+
     });
 
     $('#import').click(function() {

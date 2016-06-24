@@ -70,7 +70,42 @@ $(document).ready(function() {
         readOnly: false
     });
 
+    editor.commands.addCommand({
+        name: "replace",
+        bindKey: {win: "Ctrl-R", mac: "Command-Option-R"},
+        exec: function(editor) {
+            ace.config.loadModule("ace/ext/searchbox", function(e) {e.Search(editor, true)});
+        }
+    });
+
     editor.on('change', function() {
         inputChanged();
     });
+
+    function onKeyDown(e) {
+        if (e.ctrlKey) { // ctrl
+            if (e.keyCode == 82) { // +r
+                e.preventDefault();
+                console.log('ctrl-r');
+                return
+            }
+        }
+
+        if (e.keyCode == 13) { // enter
+            if (e.shiftKey) { // +shift
+                e.preventDefault();
+                runWrap();
+                return
+            }
+            if (e.ctrlKey) { // +ctrl
+                e.preventDefault();
+                formatWrap();
+                return
+            }
+        }
+    }
+    // register the handler
+    document.addEventListener('keydown', onKeyDown, false);
+
+    $('#editor').prepend('<a class="btn control" data-toggle="modal" data-target="#tipsModal"><i class="fa fa-lg fa-question"></i></a>');
 });

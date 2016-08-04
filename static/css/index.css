@@ -27,19 +27,20 @@ div.output {
 }
 
 a.control {
+    border: 1px solid #999;
     position: absolute;
     right: 20px;
     top: 20px;
     border-radius: 90px;
-    background: rgba(43,43,43,.7);
-    color: #ccc;
+    background: rgba(43,43,43,0);
+    color: #999;
     letter-spacing: 1px;
     transition: all .5s;
     z-index: 98;
 }
 
 a.control:hover {
-    border: 1px solid gray;
+    border: 1px solid #282828;
     color: #282828;
     background: #e4e4e4;
 }

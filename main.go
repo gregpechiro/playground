@@ -22,7 +22,7 @@ const salt = "[replace this with something unique]"
 var mux = web.NewMux()
 var tmpl *web.TmplCache
 var projects = "projects"
-var Mutex = sync.RWMutex{}
+var Mutex sync.RWMutex
 
 func init() {
 
@@ -183,6 +183,8 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	path := projects + "/" + dir
 	resp := make(map[string]interface{})
 
+	Mutex.Lock()
+	defer Mutex.Unlock()
 	if err := os.MkdirAll(path, 0755); err != nil {
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."

@@ -86,8 +86,19 @@ $(document).ready(function() {
         if (e.ctrlKey) { // ctrl
             if (e.keyCode == 82) { // +r
                 e.preventDefault();
-                console.log('ctrl-r');
                 return
+            }
+        }
+
+        if (e.ctrlKey) { // ctrl
+            if (e.shiftKey) { // + shift
+                if (e.keyCode == 83) { // +s
+                    e.preventDefault();
+                    $('#flipper').removeClass('flip');
+                    $('#flipTrigger').text('Settings');
+                    sizeof();
+                    return
+                }
             }
         }
 
@@ -108,4 +119,15 @@ $(document).ready(function() {
     document.addEventListener('keydown', onKeyDown, false);
 
     $('#editor').prepend('<a class="btn control" data-toggle="modal" data-target="#tipsModal"><i class="fa fa-lg fa-question"></i></a>');
+
+    // flipper
+    $('#flipTrigger').click(function() {
+        $('#flipper').toggleClass('flip');
+        if (this.innerText === 'Settings') {
+            this.innerText = 'Sizeof';
+            return
+        }
+        this.innerText = 'Settings';
+        return
+    });
 });

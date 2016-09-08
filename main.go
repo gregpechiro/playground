@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,6 +17,8 @@ import (
 	"sync"
 
 	"github.com/cagnosolutions/web"
+
+	"github.com/gregpechiro/playground/sizeof"
 )
 
 const salt = "[replace this with something unique]"
@@ -34,7 +38,7 @@ func init() {
 
 func main() {
 
-	mux.AddRoutes(index, run, format, share, view)
+	mux.AddRoutes(index, run, format, share, view, sizeOf)
 
 	fmt.Println("REMEMBER TO REGISTER ANY NEW ROUTES")
 	log.Fatal(http.ListenAndServe(":8888", mux))
@@ -73,7 +77,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf("main.go >> run >> os.MkdirAll() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -83,7 +87,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -92,7 +96,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf(`main.go >> run >> os.Getwd >> %v\n\n`, err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -100,7 +104,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}*/
 
@@ -111,7 +115,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf("main.go >> run >> exec.Command.CombinedOutput(\"go\", \"clean\") >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -127,7 +131,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		out = strings.Replace(out, "./main.go:", "Line ", -1)
 		resp["output"] = out
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -142,7 +146,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 			resp["output"] = "Server error. Please try again."
 		}
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -160,7 +164,7 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 			resp["output"] = "Server error. Please try again."
 		}
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}*/
 
@@ -168,13 +172,13 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
 		resp["output"] = "Server error. Please try again."
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}*/
 
 	resp["error"] = false
 	resp["output"] = out
-	ajaxResponse(w, resp)
+	AjaxResponse(w, resp)
 	return
 }}
 
@@ -188,7 +192,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	if err := os.MkdirAll(path, 0755); err != nil {
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -198,7 +202,7 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again"
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -234,13 +238,13 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 		resp["output"] = out
 
 		resp["error"] = true
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
 	resp["error"] = false
 	resp["output"] = fmt.Sprintf("%s", b)
-	ajaxResponse(w, resp)
+	AjaxResponse(w, resp)
 	return
 }}
 
@@ -253,7 +257,7 @@ var share = web.Route{"POST", "/share", func(w http.ResponseWriter, r *http.Requ
 	if err := os.MkdirAll(path, 0755); err != nil {
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
@@ -261,18 +265,77 @@ var share = web.Route{"POST", "/share", func(w http.ResponseWriter, r *http.Requ
 		log.Printf("main.go >> run >> ioutil.WriteFile() >> %v\n\n", err)
 		resp["error"] = true
 		resp["output"] = "Server error. Please try again."
-		ajaxResponse(w, resp)
+		AjaxResponse(w, resp)
 		return
 	}
 
 	resp["error"] = false
 	resp["output"] = dir
-	ajaxResponse(w, resp)
+	AjaxResponse(w, resp)
 	return
 
 }}
 
-func ajaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
+var sizeOf = web.Route{"POST", "/sizeof", func(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]interface{})
+	code := r.FormValue("code")
+	if code == "" {
+		resp["error"] = true
+		resp["output"] = "No code was submitted!"
+		AjaxResponse(w, resp)
+		return
+	}
+
+	// code := `struct {
+	// 	a string
+	// 	b bool
+	// 	c string
+	// }`
+
+	toRender := &struct {
+		Code   string
+		Result *sizeof.ViewData
+		Error  string
+	}{Code: code}
+
+	result, err := sizeof.ParseCode(code)
+	if err != nil {
+		toRender.Error = err.Error()
+	} else {
+		toRender.Result = sizeof.CreateViewData(result)
+	}
+
+	var fns = template.FuncMap{
+		"unvischunk": func(x int, len int) bool {
+			return x > 2 && x < (len-1)
+		},
+	}
+
+	t, err := template.New("Sizeof").Funcs(fns).Parse(SizeOfDisplay)
+	if err != nil {
+		log.Printf("main.go >> sizeOf >> template.Parse() >> %v\n\n", err)
+		resp["error"] = true
+		resp["output"] = "Error processing. Please try again"
+		AjaxResponse(w, resp)
+		return
+	}
+	buf := new(bytes.Buffer)
+	err = t.Execute(buf, toRender)
+	if err != nil {
+		log.Printf("main.go >> sizeOf >> t.Execute() >> %v\n\n", err)
+		resp["error"] = true
+		resp["output"] = "Error processing. Please try again"
+		AjaxResponse(w, resp)
+		return
+	}
+	resp["error"] = false
+	resp["output"] = buf.String()
+	AjaxResponse(w, resp)
+	return
+	//templates["index"].ExecuteTemplate(w, "base", toRender)
+}}
+
+func AjaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	b, err := json.Marshal(resp)

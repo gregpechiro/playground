@@ -5,8 +5,7 @@ $(document).ready(function() {
 function sizeof() {
     var tempCode = editor.getSelectedText();
     if (tempCode === '') {
-        $('#sizeofResults').css('color', 'orangered');
-        $('#sizeofResults').html('No selected code.');
+        $('#sizeofResults').html('<div class="bs-callout bs-callout-danger"><h4>Error</h4><p>No selected code.</p></div>');
         return
     }
     $.ajax({
@@ -16,17 +15,16 @@ function sizeof() {
             code: tempCode
         },
         success: function(resp) {
-            if (!resp.error) {
-                $('#sizeofResults').css('color', '');
-            } else {
-                $('#sizeofResults').css('color', 'orangered');
+            if (resp.error) {
+                // var div = $('<div class="bs-callout bs-callout-danger">' + resp.output + '</div>')
+                $('#sizeofResults').html('<div class="bs-callout bs-callout-danger"><h4>Error</h4><p>' + resp.output + '</p></div>');
+                return
             }
             $('#sizeofResults').html(resp.output);
         },
         error: function() {
-            console.log('ajax error');
-            $('#sizeofResults').css('color', 'orangered');
-            $('#sizeofResults').html('Server error. Please try again.');
+            console.log('sizeof ajax error');
+            $('#sizeofResults').html('<div class="bs-callout bs-callout-danger"><h4>Server Error</h4><p>Please try again</p></div>');
         }
     });
 }

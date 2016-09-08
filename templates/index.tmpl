@@ -34,20 +34,6 @@
                         <li><a class="click" id="share">Share</a></li>
                         <li><a class="click" id="resetCode">Reset</a></li>
                     </ul>
-
-                    <!-- <ul class="nav navbar-nav navbar-right">
-                        <li><a href="">Tips <i class="fa fa-question"></i></a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Action</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="#">Separated link</a></li>
-                            </ul>
-                        </li>
-                    </ul> -->
                     <ul class="nav navbar-nav navbar-right">
                         <li><a id="flipTrigger" href="#">Settings</a></li>
                     </ul>
@@ -99,7 +85,12 @@ func main() {
                                 </div>
                                 <div id="sizeofResults" class="panel-body results">
                                     <div class="bs-callout bs-callout-info">
-                                        Highlight the section of code you would like to check the size of. Then pres the "Get Size" button above
+                                        <h4>Use</h4>
+                                        <p>
+                                            Highlight the section of code you
+                                            would like to check the size of.
+                                            Then pres the "Get Size" button above
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -204,6 +195,7 @@ func main() {
                                     <tr><td class="text-left">Enter+Ctrl</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Format the code.</td></tr>
                                     <tr><td class="text-left">Ctrl+F</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find one or all occurances of the given string.</td></tr>
                                     <tr><td class="text-left">Ctrl+R</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find and Replace one or all occurances of the given string.</td></tr>
+                                    <tr><td class="text-left">Ctrl+Shift+S</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Get the size of the select code. Only works on types.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -219,9 +211,12 @@ func main() {
 
             $(document).ready(function() {
 
+                // get 1/4 height
                 var heightQuart = Math.floor((window.innerHeight - 80) / 4);
 
+                // check if not a shared link in golang
                 {{ if not .loaded }}
+                    // set saved code
                     if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
                         if (settings.editor.load !== 'load') {
                             $('#loadModal').modal({backdrop: 'static', keyboard: false});
@@ -242,9 +237,11 @@ func main() {
                     }
                 {{ end }}
 
+                // set output height
                 $('#editor').css('height', (heightQuart * 3) + 'px');
                 $('#outpre').css('height', heightQuart + 'px');
 
+                // register expand click
                 $('#expand').click(function() {
                     $('#editor').animate({height:(heightQuart) + 'px'});
                     $('#outpre').animate({height:(heightQuart * 3) + 'px'});
@@ -252,6 +249,7 @@ func main() {
                     $('#collapse').removeClass('hide');
                 });
 
+                // register tips click
                 $('#collapse').click(function() {
                     $('#editor').animate({height:(heightQuart * 3) + 'px'});
                     $('#outpre').animate({height:(heightQuart) + 'px'});

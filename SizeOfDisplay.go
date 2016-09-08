@@ -7,7 +7,7 @@ var SizeOfDisplay = `{{ if .Error }}
     </div>
 {{ else }}
     {{ with .Result }}
-          <h3>Type size: {{ .Sizeof }}</h3>
+          <h3 class="no-top-margin">Type size: {{ .Sizeof }}</h3>
         {{ if .IsFixed }}
             <div class="bs-callout bs-callout-info">
                 <h4>Explanation</h4>
@@ -48,7 +48,7 @@ var SizeOfDisplay = `{{ if .Error }}
                                         {{ else }}
                                             {{ if and (gt $len 4) (eq $i 2) }}...<br/>{{ else }}
                                                 {{ range $filled := $ch.Cells }}
-                                                    <div class="chnk{{ if $ch.IsPadding }} pad{{ end }}{{ if not $filled }} empty{{ end }}"></div>
+                                                    <div class="chnk{{ if $ch.IsPadding }} pad{{ end }}{{ if not $filled }} empty{{ end }}">X</div>
                                                 {{ end }}
                                                 <br/>
                                             {{ end }}

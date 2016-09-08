@@ -28,11 +28,7 @@ type ViewData struct {
 	Details []*row
 }
 
-func (data *ViewData) prepareFields(
-	fields []*TypeInfo,
-	offset uint64,
-	topLevel bool,
-) uint64 {
+func (data *ViewData) prepareFields(fields []*TypeInfo, offset uint64, topLevel bool) uint64 {
 	for _, field := range fields {
 		switch {
 		case field.IsArray:
@@ -112,12 +108,12 @@ func (data *ViewData) prepareFields(
 	return offset
 }
 
-func CreateViewData(typ *TypeInfo) (data *ViewData) {
-	data = &ViewData{TypeInfo: typ}
+func CreateViewData(typ *TypeInfo) *ViewData {
+	data := &ViewData{TypeInfo: typ}
 	if !typ.IsStruct {
-		return
+		return data
 	}
 	data.Details = make([]*row, 0, len(typ.Fields))
 	data.prepareFields(typ.Fields, 0, true)
-	return
+	return data
 }

@@ -3,8 +3,8 @@ package sizeof
 import (
 	"errors"
 	"fmt"
-	. "go/ast"
-	. "go/parser"
+	"go/ast"
+	"go/parser"
 	"go/token"
 	"reflect"
 	"strconv"
@@ -57,9 +57,9 @@ type TypeInfo struct {
 	Fields   []*TypeInfo
 }
 
-func parseType(n Node) (*TypeInfo, error) {
+func parseType(n ast.Node) (*TypeInfo, error) {
 	switch node := n.(type) {
-	case *Ident:
+	case *ast.Ident:
 		size, exists := BasicSizes[node.Name]
 		if !exists {
 			return nil, fmt.Errorf("unknown type '%s'", node.Name)
@@ -70,42 +70,42 @@ func parseType(n Node) (*TypeInfo, error) {
 			Name:    node.Name,
 			IsFixed: true,
 		}, nil
-	case *StarExpr: // todo: maybe more deep checking?
+	case *ast.StarExpr: // todo: maybe more deep checking?
 		return &TypeInfo{
 			Sizeof:  FixedSizes["ptr"],
 			Alignof: min(FixedSizes["ptr"], BasicSizes["uintptr"]),
 			Name:    "pointer",
 			IsFixed: true,
 		}, nil
-	case *MapType:
+	case *ast.MapType:
 		return &TypeInfo{
 			Sizeof:  FixedSizes["map"],
 			Alignof: min(FixedSizes["map"], BasicSizes["uintptr"]),
 			Name:    "map",
 			IsFixed: true,
 		}, nil
-	case *ChanType:
+	case *ast.ChanType:
 		return &TypeInfo{
 			Sizeof:  FixedSizes["chan"],
 			Alignof: min(FixedSizes["chan"], BasicSizes["uintptr"]),
 			Name:    "channel",
 			IsFixed: true,
 		}, nil
-	case *FuncLit:
+	case *ast.FuncLit:
 		return &TypeInfo{
 			Sizeof:  FixedSizes["func"],
 			Alignof: min(FixedSizes["func"], BasicSizes["uintptr"]),
 			Name:    "function",
 			IsFixed: true,
 		}, nil
-	case *FuncType:
+	case *ast.FuncType:
 		return &TypeInfo{
 			Sizeof:  FixedSizes["func"],
 			Alignof: min(FixedSizes["func"], BasicSizes["uintptr"]),
 			Name:    "function",
 			IsFixed: true,
 		}, nil
-	case *ArrayType:
+	case *ast.ArrayType:
 		if node.Len == nil {
 			return &TypeInfo{
 				Sizeof:  FixedSizes["slice"],
@@ -114,7 +114,7 @@ func parseType(n Node) (*TypeInfo, error) {
 				IsFixed: true,
 			}, nil
 		}
-		len, ok := node.Len.(*BasicLit)
+		len, ok := node.Len.(*ast.BasicLit)
 		if !ok || len.Kind != token.INT {
 			return nil, errInvalidArrayLength
 		}
@@ -132,7 +132,7 @@ func parseType(n Node) (*TypeInfo, error) {
 			Name:    "array",
 			IsArray: true,
 		}, nil
-	case *StructType:
+	case *ast.StructType:
 		strct := &TypeInfo{
 			Alignof:  1, // empty struct has unsafe.Alignof() == 1
 			Name:     "struct",
@@ -148,7 +148,7 @@ func parseType(n Node) (*TypeInfo, error) {
 				return nil, err
 			}
 			if len(field.Names) > 0 {
-				typ.Name = field.Names[0].Name + " " + typ.Name
+				typ.Name = field.Names[0].Name + "<br/>" + typ.Name
 			}
 			if typ.Alignof > strct.Alignof {
 				strct.Alignof = typ.Alignof
@@ -192,7 +192,7 @@ func min(x, y uint64) uint64 {
 }
 
 func ParseCode(code string) (*TypeInfo, error) {
-	expr, err := ParseExpr(code)
+	expr, err := parser.ParseExpr(code)
 	if err != nil {
 		if i := strings.Index(code, "struct"); i > -1 && strings.Contains(code, "type") {
 			code = code[i:]

@@ -25,7 +25,6 @@ function run(doc) {
             dat: doc
         },
         success: function(resp) {
-            console.log('ajax success');
             if (!resp.error) {
                 $('#outpre').css('color', '');
             } else {
@@ -35,7 +34,7 @@ function run(doc) {
             $('#outpre').text(resp.output);
         },
         error: function() {
-            console.log('ajax error');
+            console.log('run ajax error');
             $('#outpre').css('color', 'orangered');
             $('#outpre').text('Server error. Please try again.');
         }
@@ -65,8 +64,6 @@ function format(doc, doRun) {
             imp: (document.getElementById("import").checked ? 'true' : 'false')
         },
         success: function(resp) {
-            console.log('ajax success');
-            console.log(resp);
             if (!resp.error) {
                 inputChanged();
                 editor.setValue(resp.output, 1);
@@ -86,7 +83,7 @@ function format(doc, doRun) {
             return
         },
         error: function() {
-            console.log('ajax error');
+            console.log('format ajax error');
             $('#outpre').css('color', 'orangered');
             $('#outpre').text('Server error. Please try again.');
             return
@@ -96,83 +93,9 @@ function format(doc, doRun) {
 
 $(document).ready(function() {
 
-    $('#run').click(function() {
-        // editor.getSession().clearAnnotations();
-        // $('#outpre').css('color', '');
-        // $('#outpre').text('Processing');
-        // var doc = editor.getValue();
-        // settings.code = doc;
-        // saveSettings(settings);
-        // if (doc !== '') {
-        //     $.ajax({
-        //         url: '/run',
-        //         method: 'POST',
-        //         data: {
-        //             dat: doc
-        //         },
-        //         success: function(resp) {
-        //             console.log('ajax success');
-        //             if (!resp.error) {
-        //                 $('#outpre').css('color', '');
-        //             } else {
-        //                 $('#outpre').css('color', 'orangered');
-        //                 markLines(resp.output);
-        //             }
-        //             $('#outpre').text(resp.output);
-        //         },
-        //         error: function() {
-        //             console.log('ajax error');
-        //             $('#outpre').css('color', 'orangered');
-        //             $('#outpre').text('Server error. Please try again.');
-        //         }
-        //     })
-        // }
-        runWrap();
-    });
+    $('#run').click(runWrap);
 
-    $('#format').click(function() {
-        // editor.getSession().clearAnnotations();
-        // $('#outpre').text('Processing');
-        // $('#outpre').css('color', '');
-        // var doc = editor.getValue();
-        // settings.code = doc;
-        // saveSettings(settings);
-        // if (doc !== '') {
-        //     $.ajax({
-        //         url: '/format',
-        //         method: 'POST',
-        //         data: {
-        //             dat: doc,
-        //             imp: (document.getElementById("import").checked ? 'true' : 'false')
-        //         },
-        //         success: function(resp) {
-        //             console.log('ajax success');
-        //             console.log(resp);
-        //             test = resp;
-        //             if (!resp.error) {
-        //                 inputChanged();
-        //                 editor.setValue(resp.output, 1);
-        //                 settings.code = resp.output;
-        //                 saveSettings(settings);
-        //                 $('#outpre').text('Formated');
-        //                 return
-        //             }
-        //             $('#outpre').css('color', 'orangered');
-        //             $('#outpre').text(resp.output);
-        //             return
-        //         },
-        //         error: function() {
-        //             console.log('ajax error');
-        //             $('#outpre').css('color', 'orangered');
-        //             $('#outpre').text('Server error. Please try again.');
-        //             return
-        //         }
-        //     })
-        // }
-        // $('#outpre').text('');
-        formatWrap();
-
-    });
+    $('#format').click(formatWrap);
 
     $('#import').click(function() {
         if (this.checked) {
@@ -204,7 +127,6 @@ $(document).ready(function() {
                     dat: doc
                 },
                 success: function(resp) {
-                    console.log('ajax success');
                     if (resp.error) {
                         $('#outpre').css('color', 'orangered');
                         $('#outpre').text(resp.output);
@@ -212,12 +134,10 @@ $(document).ready(function() {
                     }
                     var hd = {"code": editor.getValue()}
                     path = "/" + resp.output;
-                    //var url = origin(window.location) + path;
-                    //shareURL.show().val(url).focus().select();
                     window.history.pushState(hd, "", path);
                 },
                 error: function() {
-                    console.log('ajax error');
+                    console.log('share ajax error');
                     $('#outpre').css('color', 'orangered');
                     $('#outpre').text('Server error. Please try again.');
                 }

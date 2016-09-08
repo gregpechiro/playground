@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,6 +14,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"text/template"
 
 	"github.com/cagnosolutions/web"
 
@@ -27,10 +27,12 @@ var mux = web.NewMux()
 var tmpl *web.TmplCache
 var projects = "projects"
 var Mutex sync.RWMutex
+var SizeOfTemp *template.Template
 
 func init() {
 
 	web.Funcs["pretty"] = pretty
+	SizeOfTemp = prepTemplate()
 
 	tmpl = web.NewTmplCache()
 
@@ -91,23 +93,6 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	/*currentDir, err := os.Getwd()
-	if err != nil {
-		log.Printf(`main.go >> run >> os.Getwd >> %v\n\n`, err)
-		resp["output"] = "Server error. Please try again."
-		resp["error"] = true
-		AjaxResponse(w, resp)
-		return
-	}
-
-	if err := os.Chdir(path); err != nil {
-		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
-		resp["output"] = "Server error. Please try again."
-		resp["error"] = true
-		AjaxResponse(w, resp)
-		return
-	}*/
-
 	cmd := exec.Command("go", "clean")
 	cmd.Dir = path
 	b, err := cmd.CombinedOutput()
@@ -150,32 +135,6 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	/*out, err := runCmd(10, "go", "run", path+"/main.go")
-	if err != nil {
-		if err == BuildErr {
-			log.Printf("main.go >> format >> cmd.CombinedOutput() >> %v\n\n", err)
-			//out := fmt.Sprintf("%s", b)
-			out = strings.Replace(out, "# command-line-arguments\n", "", -1)
-			out = strings.Replace(out, "temp/main.go:", "Line ", -1)
-			resp["output"] = out
-		} else if err == TimeOutErr {
-			resp["output"] = "Process took too long."
-		} else {
-			resp["output"] = "Server error. Please try again."
-		}
-		resp["error"] = true
-		AjaxResponse(w, resp)
-		return
-	}*/
-
-	/*if err := os.Chdir(currentDir); err != nil {
-		log.Printf("main.go >> run >> os.Chdir() >> %v\n\n", err)
-		resp["output"] = "Server error. Please try again."
-		resp["error"] = true
-		AjaxResponse(w, resp)
-		return
-	}*/
-
 	resp["error"] = false
 	resp["output"] = out
 	AjaxResponse(w, resp)
@@ -207,13 +166,10 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 	}
 
 	var com string
-	//var cmd *exec.Cmd
 	if r.FormValue("imp") == "true" {
 		com = "goimports"
-		//cmd = exec.Command("goimports", path+"/main.go")
 	} else {
 		com = "gofmt"
-		//cmd = exec.Command("gofmt", path+"/main.go")
 	}
 
 	cmd := exec.Command(com, "main.go")
@@ -222,7 +178,6 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 
 	if err != nil {
 		log.Printf("main.go >> format >> cmd.CombinedOutput(%q, %q) >> %v\n\n", com, "main.go", err)
-		//resp["output"] = fmt.Sprintf("Server Error. Please try again.")
 
 		out := string(b)
 		if i := strings.Index(out, "#"); i == 0 && strings.Contains(out, "\n") {
@@ -286,12 +241,6 @@ var sizeOf = web.Route{"POST", "/sizeof", func(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// code := `struct {
-	// 	a string
-	// 	b bool
-	// 	c string
-	// }`
-
 	toRender := &struct {
 		Code   string
 		Result *sizeof.ViewData
@@ -305,22 +254,8 @@ var sizeOf = web.Route{"POST", "/sizeof", func(w http.ResponseWriter, r *http.Re
 		toRender.Result = sizeof.CreateViewData(result)
 	}
 
-	var fns = template.FuncMap{
-		"unvischunk": func(x int, len int) bool {
-			return x > 2 && x < (len-1)
-		},
-	}
-
-	t, err := template.New("Sizeof").Funcs(fns).Parse(SizeOfDisplay)
-	if err != nil {
-		log.Printf("main.go >> sizeOf >> template.Parse() >> %v\n\n", err)
-		resp["error"] = true
-		resp["output"] = "Error processing. Please try again"
-		AjaxResponse(w, resp)
-		return
-	}
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, toRender)
+	err = SizeOfTemp.Execute(buf, toRender)
 	if err != nil {
 		log.Printf("main.go >> sizeOf >> t.Execute() >> %v\n\n", err)
 		resp["error"] = true
@@ -332,7 +267,6 @@ var sizeOf = web.Route{"POST", "/sizeof", func(w http.ResponseWriter, r *http.Re
 	resp["output"] = buf.String()
 	AjaxResponse(w, resp)
 	return
-	//templates["index"].ExecuteTemplate(w, "base", toRender)
 }}
 
 func AjaxResponse(w http.ResponseWriter, resp map[string]interface{}) {
@@ -354,4 +288,17 @@ func GetId(doc []byte) string {
 	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
 	base64.URLEncoding.Encode(b, sum)
 	return string(b)[:10]
+}
+
+func prepTemplate() *template.Template {
+	var fns = template.FuncMap{
+		"unvischunk": func(x int, len int) bool {
+			return x > 2 && x < (len-1)
+		},
+	}
+	t, err := template.New("Sizeof").Funcs(fns).Parse(SizeOfDisplay)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

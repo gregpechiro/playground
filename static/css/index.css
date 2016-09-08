@@ -103,3 +103,15 @@ table.tips td {
 .back {
 	transform: rotateY(180deg);
 }
+
+@media (min-width: 992px) {
+    .right-touch {
+        padding-right:0;
+    }
+}
+
+@media (min-width: 992px){
+    .left-touch {
+        padding-left:0;
+    }
+}

@@ -3,7 +3,7 @@
 clear
 
 DIR=`echo ${PWD##*/}`
-INCLUDE=("${DIR}" "templates/" "static")
+INCLUDE=("${DIR}" "templates/" "static/")
 
 if [ -f "${DIR}.tar" ]; then
 	echo "Removing old tar ${DIR}.tar..."

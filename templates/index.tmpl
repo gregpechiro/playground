@@ -33,6 +33,7 @@
                         <li><a class="click" id="export">Export</a></li>
                         <li><a class="click" id="share">Share</a></li>
                         <li><a class="click" id="resetCode">Reset</a></li>
+                        <li><a class="click" id="favorites" data-toggle="modal" data-target="#favoriteModal">Favorites</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li><a id="flipTrigger" href="#">Settings</a></li>
@@ -89,7 +90,7 @@ func main() {
                                         <p>
                                             Highlight the section of code you
                                             would like to check the size of.
-                                            Then pres the "Get Size" button above
+                                            Then press the "Get Size" button above
                                         </p>
                                     </div>
                                 </div>
@@ -167,7 +168,7 @@ func main() {
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="myModalLabel">Load</h4>
+                        <h4 class="modal-title">Load</h4>
                     </div>
                     <div class="modal-body text-center">
                         <h4>Your have previous saved code. Would you like to load it?</h4>
@@ -178,6 +179,36 @@ func main() {
             </div>
         </div>
         <!-- load modal -->
+
+        <!-- favorites modal -->
+        <div class="modal fade" id="favoriteModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Favorites</h4>
+                    </div>
+                    <div class="modal-body clearfix">
+                        <div class="row">
+                            <div class="col-lg-offset-3 col-lg-6">
+                                <div class="input-group">
+                                    <input id="favoriteName" type="text" class="form-control" placeholder="Name">
+                                    <span class="input-group-btn">
+                                        <button id="addFavorite" class="btn btn-default" type="button">Add</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="favoriteLinks" class="col-lg-offset-1 col-lg-10">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- favorites modal -->
 
         <!-- tips modal -->
         <div class="modal fade" id="tipsModal" tabindex="-1" role="dialog" aria-labelledby="tipsModalLabel">
@@ -196,6 +227,7 @@ func main() {
                                     <tr><td class="text-left">Ctrl+F</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find one or all occurances of the given string.</td></tr>
                                     <tr><td class="text-left">Ctrl+R</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Find and Replace one or all occurances of the given string.</td></tr>
                                     <tr><td class="text-left">Ctrl+Shift+S</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Get the size of the select code. Only works on types.</td></tr>
+                                    <tr><td class="text-left">Favorites</td><td class="text-left">&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</td><td>Add a favorite to quickly return to code. You can have 10 favorites. Add a new favorite with the same name to update.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -257,7 +289,27 @@ func main() {
                     $('#expand').removeClass('hide');
                 });
 
+                $(document).on('click', 'button.remove-favorite', function() {
+                    var s = $(this).attr('data-idx');
+                    if (s === '' || s=== undefined) {
+                        $('#outpre').css('color', 'orangered');
+                        $('#outpre').text('Error removing favorite. Please try again.');
+                        $('#favoriteModal').modal('hide');
+                        return
+                    }
+                    var idx =+ s;
+                    if (idx >= settings.favorites.length) {
+                        $('#outpre').css('color', 'orangered');
+                        $('#outpre').text('Error removing favorite. Please try again.');
+                        $('#favoriteModal').modal('hide');
+                        return
+                    }
+                    settings.favorites.splice(idx, 1);
+                    saveSettings(settings);
+                    displayFavorites();
+                });
             });
+
 
         </script>
     </body>

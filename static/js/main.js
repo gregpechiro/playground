@@ -1,7 +1,8 @@
-
+// global variables
 var settings = {};
 var editor = ace.edit("editor");
 
+// change path if input os changed
 function inputChanged() {
     if ((window.location.pathname == "/")) {
         return;
@@ -10,6 +11,7 @@ function inputChanged() {
 }
 
 $(document).ready(function() {
+    // setup ace editor
     editor.session.setMode("ace/mode/golang");
     editor.renderer.setShowGutter(true);
     editor.setHighlightActiveLine(true);
@@ -20,6 +22,7 @@ $(document).ready(function() {
     editor.$blockScrolling = Infinity
     $('textarea.ace_text-input').focus();
 
+    // init settings from local storage
     settings = getSettings();
     if (settings.editor !== undefined && !$.isEmptyObject(settings.editor)) {
         editor.setTheme(((settings.editor.theme === '' || settings.editor.theme === undefined) ? 'ace/theme/monokai' : settings.editor.theme));
@@ -34,6 +37,14 @@ $(document).ready(function() {
         editor.setFontSize(12);
     }
 
+    if (!Array.isArray(settings.favorites)) {
+        settings.favorites = [];
+    }
+    if (settings.favorites.length > 0) {
+        displayFavorites();
+    }
+
+    // add key bindings to ace editor
     editor.commands.addCommand({
         name: 'moveLineDown',
         bindKey: {win: 'Ctrl-down',  mac: 'Command-down'},
@@ -78,11 +89,15 @@ $(document).ready(function() {
         }
     });
 
+    // trigger path reset on update
     editor.on('change', function() {
         inputChanged();
     });
 
+    // add window key bindings
+
     function onKeyDown(e) {
+        // ctrl+r remove default
         if (e.ctrlKey) { // ctrl
             if (e.keyCode == 82) { // +r
                 e.preventDefault();
@@ -90,6 +105,7 @@ $(document).ready(function() {
             }
         }
 
+        // ctrl+shift+s run sizeof
         if (e.ctrlKey) { // ctrl
             if (e.shiftKey) { // + shift
                 if (e.keyCode == 83) { // +s
@@ -103,11 +119,13 @@ $(document).ready(function() {
         }
 
         if (e.keyCode == 13) { // enter
+            // enter + shift run
             if (e.shiftKey) { // +shift
                 e.preventDefault();
                 runWrap();
                 return
             }
+            // enter + ctrl format
             if (e.ctrlKey) { // +ctrl
                 e.preventDefault();
                 formatWrap();
@@ -118,6 +136,7 @@ $(document).ready(function() {
     // register the handler
     document.addEventListener('keydown', onKeyDown, false);
 
+    // add tips button
     $('#editor').prepend('<a class="btn control" data-toggle="modal" data-target="#tipsModal"><i class="fa fa-lg fa-question"></i></a>');
 
     // flipper

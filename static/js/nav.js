@@ -33,9 +33,8 @@ function run(doc) {
         },
         success: function(resp) {
             // check for returned error
-            if (!resp.error) {
-                $('#outpre').css('color', '');
-            } else {
+            $('#outpre').css('color', '');
+            if (resp.error) {
                 $('#outpre').css('color', 'orangered');
                 markLines(resp.output);
             }
@@ -82,7 +81,7 @@ function format(doc, doRun) {
         },
         success: function(resp) {
             // check for returned error
-            if (!resp.error) {
+            if (resp.error) {
                 // display error
                 $('#outpre').css('color', 'orangered');
                 $('#outpre').text(resp.output);

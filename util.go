@@ -3,10 +3,27 @@ package main
 import (
 	"bytes"
 	"errors"
+	"io/ioutil"
 	"os/exec"
+	"sort"
 	"strings"
 	"time"
 )
+
+func GetVersions() []string {
+	files, err := ioutil.ReadDir("env/versions")
+	if err != nil {
+		return nil
+	}
+	var versions []string
+	for _, file := range files {
+		if file.Name() != "current" {
+			versions = append(versions, file.Name())
+		}
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(versions)))
+	return versions
+}
 
 func runCmd(timeout int, command string, args ...string) (string, error) {
 

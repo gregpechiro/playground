@@ -1,7 +1,7 @@
 // save settings to local storage
 function saveSettings(settings) {
     var s = JSON.stringify(settings);
-    s = btoa(s);
+    s = btoa(unescape(encodeURIComponent(s)));
     localStorage.setItem('settings', s);
 }
 
@@ -9,7 +9,7 @@ function saveSettings(settings) {
 function getSettings() {
     var s = localStorage.getItem('settings');
     if (s !== undefined && s !== null && s !== '') {
-        s = atob(s);
+        s = decodeURIComponent(escape(atob(s)));
         if (s !== '' && s !== undefined && s[0] === '{') {
             return JSON.parse(s);
         }

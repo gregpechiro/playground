@@ -29,7 +29,8 @@ function run(doc) {
         url: '/run',
         method: 'POST',
         data: {
-            dat: doc
+            dat: doc,
+            version: $('select#version').val()
         },
         success: function(resp) {
             // check for returned error
@@ -77,7 +78,8 @@ function format(doc, doRun) {
         method: 'POST',
         data: {
             dat: doc,
-            imp: (document.getElementById("import").checked ? 'true' : 'false')
+            imp: (document.getElementById("import").checked ? 'true' : 'false'),
+            version: $('select#version').val()
         },
         success: function(resp) {
             // check for returned error

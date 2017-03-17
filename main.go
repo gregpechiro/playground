@@ -21,6 +21,8 @@ import (
 	"github.com/gregpechiro/playground/sizeof"
 )
 
+const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
+
 const salt = "[replace this with something unique]"
 
 var mux = web.NewMux()
@@ -47,8 +49,10 @@ func main() {
 }
 
 var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
+
 	tmpl.Render(w, r, "index.tmpl", web.Model{
-		"themes": themes,
+		"themes":   themes,
+		"versions": GetVersions(),
 	})
 }}
 
@@ -62,16 +66,28 @@ var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request)
 	}
 
 	tmpl.Render(w, r, "index.tmpl", web.Model{
-		"code":   string(b),
-		"loaded": true,
-		"themes": themes,
+		"code":     string(b),
+		"loaded":   true,
+		"themes":   themes,
+		"versions": GetVersions(),
 	})
 }}
 
 var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]interface{})
+	version := r.FormValue("version")
+	if version == "" {
+		version = "current"
+	}
+	if _, err := os.Stat("env/versions/" + version); err != nil {
+		log.Printf("main.go >> run >> os.Stat(env/versions/%s) >> %v\n\n", version, err)
+		resp["error"] = true
+		resp["output"] = "Server error. Please try again."
+		AjaxResponse(w, resp)
+		return
+	}
 	dir := "temp"
 	path := projects + "/" + dir
-	resp := make(map[string]interface{})
 
 	Mutex.Lock()
 	defer Mutex.Unlock()
@@ -93,7 +109,8 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	cmd := exec.Command("go", "clean")
+	cmd := exec.Command(DIR+"env/versions/"+version+"/bin/go", "clean")
+	cmd.Env = []string{"GOROOT=" + DIR + "env/versions/" + version, "GOPATH=" + DIR + "env/libs"}
 	cmd.Dir = path
 	b, err := cmd.CombinedOutput()
 	if err != nil {
@@ -104,7 +121,8 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	cmd = exec.Command("go", "build")
+	cmd = exec.Command(DIR+"env/versions/"+version+"/bin/go", "build")
+	cmd.Env = []string{"GOROOT=" + DIR + "env/versions/" + version, "GOPATH=" + DIR + "env/libs"}
 	cmd.Dir = path
 	b, err = cmd.CombinedOutput()
 	if err != nil {
@@ -142,9 +160,21 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 }}
 
 var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Request) {
+
+	resp := make(map[string]interface{})
+	version := r.FormValue("version")
+	if version == "" {
+		version = "current"
+	}
+	if _, err := os.Stat("env/versions/" + version); err != nil {
+		log.Printf("main.go >> format >> os.Stat(env/versions/%s) >> %v\n\n", version, err)
+		resp["error"] = true
+		resp["output"] = "Server error. Please try again."
+		AjaxResponse(w, resp)
+		return
+	}
 	dir := "temp"
 	path := projects + "/" + dir
-	resp := make(map[string]interface{})
 
 	Mutex.Lock()
 	defer Mutex.Unlock()
@@ -167,12 +197,13 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 
 	var com string
 	if r.FormValue("imp") == "true" {
-		com = "goimports"
+		com = DIR + "env/tools/bin/goimports"
 	} else {
-		com = "gofmt"
+		com = DIR + "env/versions/" + version + "/bin/gofmt"
 	}
 
 	cmd := exec.Command(com, "main.go")
+	cmd.Env = []string{"GOROOT=" + DIR + "env/versions/" + version, "GOPATH=" + DIR + "env/libs"}
 	cmd.Dir = path
 	b, err := cmd.CombinedOutput()
 

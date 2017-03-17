@@ -12,6 +12,9 @@ $(document).ready(function() {
     if (settings.editor.load === 'load') {
         $('#load')[0].checked = true;
     }
+    if (settings.version !== '' && settings.version !== undefined) {
+        $('select#version').val(settings.version);
+    }
 
     // update theme on change
     $('#theme').change(function() {
@@ -52,6 +55,11 @@ $(document).ready(function() {
     // update load on change
     $('input[name="load"]').change(function() {
         settings['editor']['load'] = $('#load:checked').val();
+        saveSettings(settings);
+    });
+
+    $('select#version').change(function() {
+        settings['version'] = $('select#version').val();
         saveSettings(settings);
     });
 

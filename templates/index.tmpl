@@ -36,7 +36,7 @@
                         <li><a class="click" id="favorites" data-toggle="modal" data-target="#favoriteModal">Favorites</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a id="flipTrigger" href="#">Settings</a></li>
+                        <li><a id="flipTrigger" href="#">Size Of</a></li>
                     </ul>
 
                 </div>
@@ -79,7 +79,7 @@ func main() {
                         <div class="flipper">
 
                             <!-- sizeof -->
-                            <div class="panel panel-default sizeof front">
+                            <div class="panel panel-default sizeof back">
                                 <div class="panel-heading clearfix">
                                     Sizeof
                                     <button id="getSize" class="btn btn-xs btn-primary pull-right">Get Size</button>
@@ -98,7 +98,7 @@ func main() {
                             <!-- sizeof -->
 
                             <!-- settings -->
-                            <div class="panel panel-default back">
+                            <div class="panel panel-default front">
                                 <div class="panel-heading">
                                     Settings
                                 </div>
@@ -142,6 +142,14 @@ func main() {
                                                 Always Load
                                             </label>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Go Version</label>
+                                        <select id="version" class="form-control">
+                                            {{ range $version := .versions}}
+                                                <option value="{{ $version }}">{{ $version }}</option>
+                                            {{ end }}
+                                        </select>
                                     </div>
                                     <div>
                                         <button id="reset" class="btn btn-danger btn-sm btn-block">Reset</button>

@@ -23,6 +23,8 @@ import (
 
 const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
 
+// const DIR = "/opt/playground/"
+
 const salt = "[replace this with something unique]"
 
 var mux = web.NewMux()
@@ -41,6 +43,7 @@ func init() {
 }
 
 func main() {
+	os.Setenv("PATH", "")
 
 	mux.AddRoutes(index, run, format, share, view, sizeOf)
 

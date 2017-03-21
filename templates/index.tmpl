@@ -151,6 +151,20 @@ func main() {
                                             {{ end }}
                                         </select>
                                     </div>
+                                    {{ if .session.ROLE }}
+                                        {{ if eq .session.ROLE "ADMIN" }}
+                                            <form action="/goget" method="post">
+                                                <div class="form-group">
+                                                    <div class="input-group">
+                                                        <input type="text" name="url" class="form-control" placeholder="URL">
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default">Go Get</button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        {{ end }}
+                                    {{ end  }}
                                     <div>
                                         <button id="reset" class="btn btn-danger btn-sm btn-block">Reset</button>
                                     </div>

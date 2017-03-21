@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/cagnosolutions/web"
 
@@ -89,8 +90,8 @@ var run = web.Route{"POST", "/run", func(w http.ResponseWriter, r *http.Request)
 		AjaxResponse(w, resp)
 		return
 	}
-	dir := "temp"
-	path := projects + "/" + dir
+	dir := fmt.Sprintf("%d", time.Now().Unix())
+	path := "/tmp/playground/" + dir
 
 	Mutex.Lock()
 	defer Mutex.Unlock()
@@ -176,8 +177,8 @@ var format = web.Route{"POST", "/format", func(w http.ResponseWriter, r *http.Re
 		AjaxResponse(w, resp)
 		return
 	}
-	dir := "temp"
-	path := projects + "/" + dir
+	dir := fmt.Sprintf("%d", time.Now().Unix())
+	path := "/tmp/playground/" + dir
 
 	Mutex.Lock()
 	defer Mutex.Unlock()

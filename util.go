@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io/ioutil"
+	"log"
 	"os/exec"
 	"sort"
 	"strings"
@@ -23,6 +24,21 @@ func GetVersions() []string {
 	}
 	sort.Sort(sort.Reverse(sort.StringSlice(versions)))
 	return versions
+}
+
+func IsCurrent(ver string) bool {
+	return strings.Contains(Current, ver)
+}
+
+func SetCurrent() {
+	cmd := exec.Command(DIR+"env/versions/current/bin/go", "version")
+	cmd.Env = []string{"GOROOT=" + DIR + "env/versions/current", "GOPATH=" + DIR + "env/libs"}
+	b, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("\nutil.go >> SetCurrent() >> cmd.CombinedOutput() >> %v\n", err)
+		log.Printf("\toutput >> %s\n", b)
+	}
+	Current = string(b)
 }
 
 func runCmd(timeout int, command string, args ...string) (string, error) {

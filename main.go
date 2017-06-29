@@ -33,14 +33,16 @@ var tmpl *web.TmplCache
 var projects = "projects"
 var Mutex sync.RWMutex
 var SizeOfTemp *template.Template
+var Current string
 
 func init() {
 
 	web.Funcs["pretty"] = pretty
+	web.Funcs["isCurrent"] = IsCurrent
 	SizeOfTemp = prepTemplate()
 
 	tmpl = web.NewTmplCache()
-
+	SetCurrent()
 }
 
 func main() {

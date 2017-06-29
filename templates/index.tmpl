@@ -148,7 +148,7 @@ func main() {
                                         <label>Go Version</label>
                                         <select id="version" class="form-control">
                                             {{ range $version := .versions}}
-                                                <option value="{{ $version }}">{{ $version }}</option>
+                                                <option value="{{ $version }}"{{ if isCurrent $version }}selected{{ end }}>{{ $version }}</option>
                                             {{ end }}
                                         </select>
                                     </div>

@@ -18,7 +18,7 @@ func GetVersions() []string {
 	}
 	var versions []string
 	for _, file := range files {
-		if file.Name() != "current" {
+		if file.IsDir() {
 			versions = append(versions, file.Name())
 		}
 	}
@@ -30,15 +30,17 @@ func IsCurrent(ver string) bool {
 	return strings.Contains(Current, ver)
 }
 
-func SetCurrent() {
+func SetCurrent() error {
 	cmd := exec.Command(DIR+"env/versions/current/bin/go", "version")
 	cmd.Env = []string{"GOROOT=" + DIR + "env/versions/current", "GOPATH=" + DIR + "env/libs"}
 	b, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("\nutil.go >> SetCurrent() >> cmd.CombinedOutput() >> %v\n", err)
 		log.Printf("\toutput >> %s\n", b)
+		return err
 	}
 	Current = string(b)
+	return nil
 }
 
 func runCmd(timeout int, command string, args ...string) (string, error) {

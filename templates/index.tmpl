@@ -333,6 +333,23 @@ func main() {
                 });
             });
 
+            {{ if .session.ROLE }}
+                {{ if eq .session.ROLE "ADMIN" }}
+                    function setCurrent() {
+                        $.ajax({
+                            url: "/setCurrent",
+                            method: "POST",
+                            success: function(resp) {
+                                console.log(resp.msg);
+                            },
+                            error: function(e, d) {
+                                console.log(e);
+                                console.log(d);
+                            }
+                        });
+                    }
+                {{ end }}
+            {{ end }}
 
         </script>
     </body>

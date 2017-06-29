@@ -1,6 +1,6 @@
 
 function login(s) {
-    if (s !== 'go get playground') {
+    if (s !== 'login please') {
         return;
     }
     $('<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">'+

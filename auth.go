@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
@@ -11,7 +12,7 @@ import (
 
 func init() {
 	mux.AddRoutes(login, logout)
-	mux.AddSecureRoutes(ADMIN, goGet)
+	mux.AddSecureRoutes(ADMIN, goGet, setCurrent)
 }
 
 var ADMIN = web.Auth{
@@ -47,6 +48,19 @@ var goGet = web.Route{"POST", "/goget", func(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	web.SetSuccessRedirect(w, r, "/", "Got "+r.FormValue("url"))
+	return
+}}
+
+var setCurrent = web.Route{"POST", "/setCurrent", func(w http.ResponseWriter, r *http.Request) {
+	if err := SetCurrent(); err != nil {
+		AjaxResponse(w, map[string]interface{}{
+			"msg": fmt.Sprintf("Error setting current:\n%s\n", err.Error()),
+		})
+		return
+	}
+	AjaxResponse(w, map[string]interface{}{
+		"msg": fmt.Sprintf("Successfully set current:\n%s\n", Current),
+	})
 	return
 }}
 

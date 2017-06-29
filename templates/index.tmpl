@@ -145,7 +145,7 @@ func main() {
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label>Go Version</label>
+                                        <label id="version">Go Version</label>
                                         <select id="version" class="form-control">
                                             {{ range $version := .versions}}
                                                 <option value="{{ $version }}"{{ if isCurrent $version }}selected{{ end }}>{{ $version }}</option>
@@ -331,6 +331,13 @@ func main() {
                     saveSettings(settings);
                     displayFavorites();
                 });
+
+                var versionOptions = $('select#version option');
+                for (var i = 0; i < versionOptions.length; i++) {
+                    if (versionOptions[i].innerText.indexOf("beta") > -1) {
+                        $('label#version').append("<small> *beta available</small>")
+                    }
+                }
             });
 
             {{ if .session.ROLE }}

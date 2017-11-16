@@ -31,6 +31,3 @@ if [ ! -f "$DIR.tar" ]; then
 	echo "Create $DIR.tar failed."
 	exit 1
 fi
-
-echo "SCP to playground.gregpechiro.com..."
-scp $DIR.tar greg@gregpechiro.com:/home/greg

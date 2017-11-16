@@ -22,9 +22,8 @@ import (
 	"github.com/gregpechiro/playground/sizeof"
 )
 
-const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
-
-// const DIR = "/opt/playground/"
+// const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
+const DIR = "/opt/playground/"
 
 const salt = "[replace this with something unique]"
 

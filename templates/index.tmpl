@@ -36,9 +36,9 @@
                         <li><a class="click" id="resetCode">Reset</a></li>
                         <li><a class="click" id="favorites" data-toggle="modal" data-target="#favoriteModal">Favorites</a></li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                    <!--<ul class="nav navbar-nav navbar-right">
                         <li><a id="flipTrigger" href="#">Size Of</a></li>
-                    </ul>
+                    </ul>-->
 
                 </div>
 
@@ -74,108 +74,80 @@ func main() {
 
                 </div>
                 <div id="right" class="col-md-3 col-xs-12">
-
-                    <!-- flipper -->
-                    <div id="flipper" class="flip-container">
-                        <div class="flipper">
-
-                            <!-- sizeof -->
-                            <div class="panel panel-default sizeof back">
-                                <div class="panel-heading clearfix">
-                                    Sizeof
-                                    <button id="getSize" class="btn btn-xs btn-primary pull-right">Get Size</button>
+                    <!-- settings -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Settings
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label>Theme</label>
+                                <select class="form-control" id="theme">
+                                    {{ range $theme := .themes }}
+                                        <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Font Size</label>
+                                <input class="form-control" type="number" id="fontSize">
+                            </div>
+                            <div class="form-group">
+                                <label>Keybindings</label>
+                                <select id="keybindings" class="form-control">
+                                    <option value="ace">Ace</option>
+                                    <option value="vim">Vim</option>
+                                    <option value="emacs">Emacs</option>
+                                </select>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="formatOnRun"> Format on Run
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Saved Code</label>
+                                <div class="radio" style="margin-top:0;">
+                                    <label>
+                                        <input type="radio" name="load" id="ask" value="ask" checked>
+                                        Always Ask
+                                    </label>
                                 </div>
-                                <div id="sizeofResults" class="panel-body results">
-                                    <div class="bs-callout bs-callout-info">
-                                        <h4>Use</h4>
-                                        <p>
-                                            Highlight the section of code you
-                                            would like to check the size of.
-                                            Then press the "Get Size" button above
-                                        </p>
-                                    </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="load" id="load" value="load">
+                                        Always Load
+                                    </label>
                                 </div>
                             </div>
-                            <!-- sizeof -->
-
-                            <!-- settings -->
-                            <div class="panel panel-default front">
-                                <div class="panel-heading">
-                                    Settings
-                                </div>
-                                <div class="panel-body">
-                                    <div class="form-group">
-                                        <label>Theme</label>
-                                        <select class="form-control" id="theme">
-                                            {{ range $theme := .themes }}
-                                                <option value="ace/theme/{{ $theme }}">{{ pretty $theme }}</option>
-                                            {{ end }}
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Font Size</label>
-                                        <input class="form-control" type="number" id="fontSize">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Keybindings</label>
-                                        <select id="keybindings" class="form-control">
-                                            <option value="ace">Ace</option>
-                                            <option value="vim">Vim</option>
-                                            <option value="emacs">Emacs</option>
-                                        </select>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="formatOnRun"> Format on Run
-                                        </label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Saved Code</label>
-                                        <div class="radio" style="margin-top:0;">
-                                            <label>
-                                                <input type="radio" name="load" id="ask" value="ask" checked>
-                                                Always Ask
-                                            </label>
-                                        </div>
-                                        <div class="radio">
-                                            <label>
-                                                <input type="radio" name="load" id="load" value="load">
-                                                Always Load
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label id="version">Go Version</label>
-                                        <select id="version" class="form-control">
-                                            {{ range $version := .versions}}
-                                                <option value="{{ $version }}"{{ if isCurrent $version }}selected{{ end }}>{{ $version }}</option>
-                                            {{ end }}
-                                        </select>
-                                    </div>
-                                    {{ if .session.ROLE }}
-                                        {{ if eq .session.ROLE "ADMIN" }}
-                                            <form action="/goget" method="post">
-                                                <div class="form-group">
-                                                    <div class="input-group">
-                                                        <input type="text" name="url" class="form-control" placeholder="URL">
-                                                        <span class="input-group-btn">
-                                                            <button class="btn btn-default">Go Get</button>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        {{ end }}
-                                    {{ end  }}
-                                    <div>
-                                        <button id="reset" class="btn btn-danger btn-sm btn-block">Reset</button>
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                <label id="version">Go Version</label>
+                                <select id="version" class="form-control">
+                                    {{ range $version := .versions}}
+                                        <option value="{{ $version }}"{{ if isCurrent $version }}selected{{ end }}>{{ $version }}</option>
+                                    {{ end }}
+                                </select>
                             </div>
-                            <!-- settings -->
-
+                            {{ if .session.ROLE }}
+                                {{ if eq .session.ROLE "ADMIN" }}
+                                    <form action="/goget" method="post">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text" name="url" class="form-control" placeholder="URL">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default">Go Get</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                {{ end }}
+                            {{ end  }}
+                            <div>
+                                <button id="reset" class="btn btn-danger btn-sm btn-block">Reset</button>
+                            </div>
                         </div>
                     </div>
-                    <!-- flipper -->
+                    <!-- settings -->
 
                 </div>
             </div>

@@ -24,9 +24,9 @@ import (
 
 const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
 
-// const DIR = "/opt/playground/"
+const DIR = "/opt/playground/"
 
-const salt = "[replace this with something unique]"
+//const salt = "[replace this with something unique]"
 
 var mux = web.NewMux()
 var tmpl *web.TmplCache
@@ -59,6 +59,7 @@ var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
 	tmpl.Render(w, r, "index.tmpl", web.Model{
 		"themes":   themes,
 		"versions": GetVersions(),
+		"current":  Current,
 	})
 }}
 
@@ -76,6 +77,7 @@ var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request)
 		"loaded":   true,
 		"themes":   themes,
 		"versions": GetVersions(),
+		"current":  Current,
 	})
 }}
 

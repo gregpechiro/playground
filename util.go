@@ -6,7 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -22,7 +24,44 @@ func GetVersions() []string {
 			versions = append(versions, file.Name())
 		}
 	}
-	sort.Sort(sort.Reverse(sort.StringSlice(versions)))
+	// sort.Sort(sort.Reverse(sort.StringSlice(versions)))
+	sort.SliceStable(versions, func(i, j int) bool {
+		ver1, ver2 := versions[i], versions[j]
+		if ver1 == ver2 {
+			return true
+		}
+
+		ver1S, ver2S := strings.Split(ver1, "."), strings.Split(ver2, ".")
+
+		ver1Slen, ver2Slen := len(ver1S), len(ver2S)
+
+		if ver1Slen > ver2Slen {
+			for k := 0; k < (ver1Slen - ver2Slen); k++ {
+				ver2S = append(ver2S, "0")
+			}
+		}
+		if ver2Slen > ver1Slen {
+			for k := 0; k < (ver2Slen - ver1Slen); k++ {
+				ver1S = append(ver1S, "0")
+			}
+		}
+		ver1Slen, ver2Slen = len(ver1S), len(ver2S)
+		for k := 0; k < ver1Slen; k++ {
+			ver1Int, _ := strconv.Atoi(ver1S[k])
+			ver2Int, _ := strconv.Atoi(ver2S[k])
+			if ver1Int == ver2Int {
+				continue
+			}
+			if ver1Int < ver2Int {
+				return false
+			}
+			if ver1Int > ver2Int {
+				return true
+			}
+		}
+		return false
+
+	})
 	return versions
 }
 
@@ -39,7 +78,8 @@ func SetCurrent() error {
 		log.Printf("\toutput >> %s\n", b)
 		return err
 	}
-	Current = string(b)
+	re := regexp.MustCompile(`[0-9]\.[0-9]*\.*[0-9]*`)
+	Current = re.FindString(string(b))
 	return nil
 }
 

@@ -22,11 +22,11 @@ import (
 	"github.com/gregpechiro/playground/sizeof"
 )
 
-const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
+//const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
 
 const DIR = "/opt/playground/"
 
-//const salt = "[replace this with something unique]"
+const salt = "[replace this with something unique]"
 
 var mux = web.NewMux()
 var tmpl *web.TmplCache

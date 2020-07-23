@@ -8,16 +8,15 @@ function runWrap() {
     var doc = editor.getValue();
     if (doc !== '') {
         // save code
-        settings.code = doc;
-        saveSettings(settings);
+        saveCode(settings.language, doc);
         if (settings.formatOnRun) {
             // format then run
             format(doc, true);
-            return
+            return;
         }
         // run without format
         run(doc);
-        return
+        return;
     }
     $('#outpre').text('');
 }
@@ -30,6 +29,7 @@ function run(doc) {
         method: 'POST',
         data: {
             dat: doc,
+            language:$('select#language').val(),
             version: $('select#version').val()
         },
         success: function(resp) {
@@ -61,11 +61,10 @@ function formatWrap() {
     var doc = editor.getValue();
     if (doc !== '') {
         // save code
-        settings.code = doc;
-        saveSettings(settings);
+        saveCode(settings.language, doc);
         // format vpde
         format(doc, false);
-        return
+        return;
     }
     $('#outpre').text('');
 }
@@ -79,6 +78,7 @@ function format(doc, doRun) {
         data: {
             dat: doc,
             imp: (document.getElementById("import").checked ? 'true' : 'false'),
+            language: $('select#language').val(),
             version: $('select#version').val()
         },
         success: function(resp) {
@@ -88,22 +88,21 @@ function format(doc, doRun) {
                 $('#outpre').css('color', 'orangered');
                 $('#outpre').text(resp.output);
                 markLines(resp.output);
-                return
+                return;
             }
             // replace editor with formated code
             editor.setValue(resp.output, 1);
             // save code
-            settings.code = resp.output;
-            saveSettings(settings);
+            saveCode(settings.language, resp.output);
             if (doRun) {
                 // run if necessary
                 $('#outpre').text('Formated\nProcessing');
                 run(resp.output);
-                return
+                return;
             }
             // print output
             $('#outpre').text('Formated');
-            return
+            return;
 
         },
         // display server error
@@ -111,7 +110,7 @@ function format(doc, doRun) {
             console.log('format ajax error');
             $('#outpre').css('color', 'orangered');
             $('#outpre').text('Server error. Please try again.');
-            return
+            return;
         }
     });
 }
@@ -150,8 +149,7 @@ $(document).ready(function() {
         //get code
         var doc = editor.getValue();
         // save code
-        settings.code = doc;
-        saveSettings(settings);
+        saveCode(settings.language, doc);
         if (doc !== '') {
             // post share
             $.ajax({
@@ -185,9 +183,10 @@ $(document).ready(function() {
 
     // reset click
     $('#resetCode').click(function() {
-        editor.setValue('package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("Hello, custom playground")\n}', 1);
-        settings.code = '';
-        saveSettings(settings);
+        const code = defaultCode[settings.language];
+        console.log(code);
+        editor.setValue(code, 1);
+        saveCode(settings.language, code);
     });
 
     // favorite click
@@ -219,8 +218,7 @@ $(document).ready(function() {
         // get code
         var doc = editor.getValue();
         //save code
-        settings.code = doc;
-        saveSettings(settings);
+        saveCode(settings.language, doc);
         if (doc !== '') {
             // share post
             $.ajax({

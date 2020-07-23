@@ -118,14 +118,14 @@ func main() {
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label id="version">Go Version</label>
-                                <select id="version" class="form-control">
-                                    <option value="current" selected>Current ({{ .current }})</option>
-                                    {{ range $version := .versions}}
-                                        <option value="{{ $version }}">{{ $version }}</option>
+                                <label id="languages">Language</label>
+                                <select id="language" class="form-control">
+                                    {{ range $language, $versions := .languages }}
+                                        <option value="{{ $language }}">{{ $language }}</option>
                                     {{ end }}
                                 </select>
                             </div>
+
                             {{ if .session.ROLE }}
                                 {{ if eq .session.ROLE "ADMIN" }}
                                     <form action="/goget" method="post">
@@ -230,9 +230,13 @@ func main() {
         </div>
         <!-- tips modal -->
 
+
+
         {{ template "scripts.tmpl" . }}
 
         <script>
+
+            var languages = JSON.parse({{ if gt (len .languages) 0 }}'{{ toJSON .languages }}'{{ else }}'{}'{{ end }})
 
             $(document).ready(function() {
 
@@ -242,24 +246,27 @@ func main() {
                 // check if not a shared link in golang
                 {{ if not .loaded }}
                     // set saved code
-                    if (settings.code !== '' && settings.code !== undefined && settings.code !== editor.getValue()) {
+                    let code = getCode(settings.language);
+                    const dCode  = defaultCode[settings.language];
+                    if (code && code !== dCode) {
                         if (settings.editor.load !== 'load') {
                             $('#loadModal').modal({backdrop: 'static', keyboard: false});
 
                             $('#loadYes').click(function() {
-                                editor.setValue(settings.code, 1);
                                 $('#loadModal').modal('hide');
                             });
 
                             $('#loadNo').click(function() {
-                                settings.code = '';
-                                saveSettings(settings);
+                                saveCode(settings.language, '');
+                                editor.setValue(dCode, 1);
                                 $('#loadModal').modal('hide');
                             });
-                        } else {
-                            editor.setValue(settings.code, 1);
                         }
+                    } else {
+                        code = dCode;
                     }
+                    console.log(settings);
+                    // editor.setValue(code, 1);
                 {{ end }}
 
                 // set output height

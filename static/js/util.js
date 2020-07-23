@@ -5,6 +5,21 @@ function saveSettings(settings) {
     localStorage.setItem('settings', s);
 }
 
+function saveCode(language, code) {
+    localStorage.setItem(language, code);
+}
+
+function getCode(language) {
+    let code = localStorage.getItem(language);
+    if (!code) {
+        code = defaultCode[language];
+        if (!code) {
+            code = '';
+        }
+    }
+    return code;
+}
+
 // return saved settings from local storage
 function getSettings() {
     var s = localStorage.getItem('settings');
@@ -68,4 +83,20 @@ function displayFavorites() {
     }
     // set favorite links
     $('#favoriteLinks').html(links);
+}
+
+function setEditorLanguage(language) {
+    switch (language) {
+        case 'Go':
+            editor.session.setMode("ace/mode/golang");
+            break;
+        case 'Java':
+            editor.session.setMode("ace/mode/java");
+            break;
+        case 'Python':
+            editor.session.setMode("ace/mode/python");
+            break;
+        default:
+            return;
+    }
 }

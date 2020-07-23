@@ -12,7 +12,6 @@ function inputChanged() {
 
 $(document).ready(function() {
     // setup ace editor
-    editor.session.setMode("ace/mode/golang");
     editor.renderer.setShowGutter(true);
     editor.setHighlightActiveLine(true);
     editor.setReadOnly(false);
@@ -29,17 +28,21 @@ $(document).ready(function() {
 
     // init settings from local storage
     settings = getSettings();
-    if (settings.editor !== undefined && !$.isEmptyObject(settings.editor)) {
-        editor.setTheme(((settings.editor.theme === '' || settings.editor.theme === undefined) ? 'ace/theme/monokai' : settings.editor.theme));
-        editor.setFontSize(((settings.editor.fontSize === '' || settings.editor.fontSize === undefined) ? 12 : settings.editor.fontSize));
-        if (settings.editor.keys === 'vim') {
-            editor.setKeyboardHandler("ace/keyboard/vim");
-        } else if (settings.editor.keys === 'emacs'){
-            editor.setKeyboardHandler("ace/keyboard/emacs");
+    if (settings.editor !== undefined) {
+        if(!$.isEmptyObject(settings.editor)) {
+            editor.setTheme(((settings.editor.theme === '' || settings.editor.theme === undefined) ? 'ace/theme/monokai' : settings.editor.theme));
+            editor.setFontSize(((settings.editor.fontSize === '' || settings.editor.fontSize === undefined) ? 12 : settings.editor.fontSize));
+            if (settings.editor.keys === 'vim') {
+                editor.setKeyboardHandler("ace/keyboard/vim");
+            } else if (settings.editor.keys === 'emacs'){
+                editor.setKeyboardHandler("ace/keyboard/emacs");
+            }
+        } else {
+            editor.session.setMode("ace/mode/golang");
+            editor.setTheme('ace/theme/monokai');
+            editor.setFontSize(12);
         }
-    } else {
-        editor.setTheme('ace/theme/monokai');
-        editor.setFontSize(12);
+        setEditorLanguage(settings.language);
     }
 
     if (!Array.isArray(settings.favorites)) {
@@ -100,7 +103,6 @@ $(document).ready(function() {
     });
 
     // add window key bindings
-
     function onKeyDown(e) {
         // ctrl+r remove default
         if (e.ctrlKey) { // ctrl

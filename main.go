@@ -22,9 +22,10 @@ import (
 	"github.com/gregpechiro/playground/sizeof"
 )
 
-//const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
+const DIR = "/home/greg/code/go/src/github.com/gregpechiro/playground/"
+const LanguagesDir = "languages"
 
-const DIR = "/opt/playground/"
+// const DIR = "/opt/playground/"
 
 const salt = "[replace this with something unique]"
 
@@ -39,6 +40,7 @@ func init() {
 
 	web.Funcs["pretty"] = pretty
 	web.Funcs["isCurrent"] = IsCurrent
+	web.Funcs["toJSON"] = ToJSON
 	SizeOfTemp = prepTemplate()
 
 	tmpl = web.NewTmplCache()
@@ -57,9 +59,9 @@ func main() {
 var index = web.Route{"GET", "/", func(w http.ResponseWriter, r *http.Request) {
 
 	tmpl.Render(w, r, "index.tmpl", web.Model{
-		"themes":   themes,
-		"versions": GetVersions(),
-		"current":  Current,
+		"themes":    themes,
+		"languages": GetLanguages(LanguagesDir),
+		"current":   Current,
 	})
 }}
 
@@ -73,11 +75,11 @@ var view = web.Route{"GET", "/:id", func(w http.ResponseWriter, r *http.Request)
 	}
 
 	tmpl.Render(w, r, "index.tmpl", web.Model{
-		"code":     string(b),
-		"loaded":   true,
-		"themes":   themes,
-		"versions": GetVersions(),
-		"current":  Current,
+		"code":      string(b),
+		"loaded":    true,
+		"themes":    themes,
+		"languages": GetLanguages(LanguagesDir),
+		"current":   Current,
 	})
 }}
 

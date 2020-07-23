@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os/exec"
@@ -13,8 +15,25 @@ import (
 	"time"
 )
 
-func GetVersions() []string {
-	files, err := ioutil.ReadDir("env/versions")
+func GetLanguages(path string) map[string][]string {
+	languages := make(map[string][]string)
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
+			languages[file.Name()] = GetVersions(path + "/" + file.Name())
+		}
+	}
+	return languages
+}
+
+func GetVersions(path string) []string {
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil
 	}
@@ -150,6 +169,14 @@ func pretty(s string) string {
 		}
 	}
 	return s
+}
+
+func ToJSON(v interface{}) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }
 
 var themes = []string{

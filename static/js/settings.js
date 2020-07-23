@@ -15,6 +15,9 @@ $(document).ready(function() {
     if (settings.version !== '' && settings.version !== undefined) {
         $('select#version').val(settings.version);
     }
+    if (settings.language !== '' && settings.language !== undefined) {
+        $('select#language').val(settings.language);
+    }
 
     // update theme on change
     $('#theme').change(function() {
@@ -56,6 +59,16 @@ $(document).ready(function() {
     $('input[name="load"]').change(function() {
         settings['editor']['load'] = $('#load:checked').val();
         saveSettings(settings);
+    });
+
+    $('select#language').change(function() {
+        var language = $(this).val();
+        setEditorLanguage(language);
+        saveCode(settings['language'], editor.getValue());
+        settings['language'] = language;
+        saveSettings(settings);
+        editor.setValue(getCode(language), 1);
+        //console.log(languages[language]);
     });
 
     $('select#version').change(function() {
